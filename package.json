@@ -107,7 +107,13 @@
           "when": "view == azure.batch.explorer && viewItem == azure.batch.resource"
         }
       ]
-    }
+    },
+    "jsonValidation": [
+      {
+        "fileMatch": "*.job.json",
+        "url": "./schema/job.schema.json"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "tsc -p ./",

@@ -1,0 +1,56 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    // TODO: we really want to be able to use the service Swagger here except we need to support the CLI Batch extensions
+    "title": "Job",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "string",
+            "description": "id placeholder docs"
+        },
+        "displayName": {
+            "type": "string"
+        },
+        "poolInfo": {
+            "type": "object",
+            "description": "pool info placeholder docs",
+            "$ref": "#definitions/poolInfo"
+        }
+        
+    },
+    "definitions": {
+        "poolInfo": {
+            "oneOf": [
+                {
+                    "properties": {
+                        "poolId": {
+                            "type": "string"
+                        }
+                    },
+                    "required": ["poolId"]
+                },
+                {
+                    "properties": {
+                        "autoPoolSpecification": {
+                            "type": "object",
+                            "$ref": "#definitions/autoPoolSpecification"
+                        }
+                    },
+                    "required": ["autoPoolSpecification"]
+                }
+            ]
+        },
+        "autoPoolSpecification": {
+            "properties": {
+                "vmSize": {
+                    "type": "string"
+                },
+                "targetDedicatedNodes": {
+                    "type": "integer"
+                }
+            },
+            "required": ["vmSize", "targetDedicatedNodes"]
+        }
+    },
+    "required": ["id", "poolInfo"]
+}
