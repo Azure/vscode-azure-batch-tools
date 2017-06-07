@@ -1,4 +1,4 @@
-export function parseBatchTemplate(text : string, resourceType : BatchResourceType) : IBatchTemplate | null {
+export function parseBatchTemplate(text : string, resourceType : BatchResourceType) : IBatchResource | null {
     
     try {
 
@@ -7,18 +7,39 @@ export function parseBatchTemplate(text : string, resourceType : BatchResourceTy
             return null;
         }
 
-        if (!jobject[resourceType]) {
-            return null;
+        if (looksLikeTemplate(jobject, resourceType)) {
+            return parseTemplateCore(jobject);
         }
 
-        return parseTemplateCore(jobject);
+        return { isTemplate: false, parameters: [] };
 
     } catch (SyntaxError) {
         return null;
     }
 }
 
-function parseTemplateCore(json : any) : IBatchTemplate {
+function looksLikeTemplate(json : any, resourceType : BatchResourceType) : boolean {
+    const resourceDecl = json[resourceType];
+    if (!resourceDecl) {
+        return false;
+    }
+
+    if (resourceDecl.type && resourceDecl.properties) {
+        return resourceDecl.type == "Microsoft.Batch/batchAccounts/" + plural(resourceType);
+    }
+
+    return false;
+}
+
+function plural(resourceType : BatchResourceType) : string {
+    switch (resourceType) {
+        case 'job': return 'jobs';
+        case 'pool': return 'pools';
+        default: throw `unknown resource type ${resourceType}`;
+    }
+}
+
+function parseTemplateCore(json : any) : IBatchResource {
     
     const parameters : IBatchTemplateParameter[] = [];
 
@@ -33,7 +54,7 @@ function parseTemplateCore(json : any) : IBatchTemplate {
         })
     }
 
-    return { parameters: parameters };
+    return { isTemplate: true, parameters: parameters };
 
 }
 
@@ -66,7 +87,8 @@ function parseParametersCore(json : any) : IParameterValue[] {
     return parameters;
 }
 
-export interface IBatchTemplate {
+export interface IBatchResource {
+    readonly isTemplate : boolean;
     readonly parameters : IBatchTemplateParameter[];
 }
 

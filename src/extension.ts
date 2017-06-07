@@ -59,6 +59,9 @@ async function createResourceImpl(doc : vscode.TextDocument, resourceType : batc
         await doc.save();
     }
 
+    // TODO: this results in the unnecessary creation and deletion of a temp file in
+    // the non-template case - it is harmless and simplifies the code, but it would be
+    // nice not to have to do it!
     const parameterFile = await getParameterFile(templateFileName, resourceType);
 
     const knownParametersText = getParameterJson(parameterFile);
@@ -74,13 +77,16 @@ async function createResourceImpl(doc : vscode.TextDocument, resourceType : batc
 
     const parameterFilePath = tempParameterInfo ? tempParameterInfo.path : parameterFile.path;
 
+    const cleanup = tempParameterInfo ? () => { fs.unlinkSync(tempParameterInfo.path); } : () => { return; };
+    const commandOptions = templateInfo.isTemplate ?
+        `--template "${doc.fileName}" --parameters "${parameterFilePath}"` :
+        `--json-file "${doc.fileName}"`;
+
     output.show();
     output.appendLine(`Creating Azure Batch ${resourceType}...`);
 
-    shelljs.exec(`az batch ${resourceType} create --template "${doc.fileName}" --parameters "${parameterFilePath}"`, { async: true }, (code : number, stdout : string, stderr : string) => {
-        if (tempParameterInfo) {
-            fs.unlinkSync(tempParameterInfo.path);
-        }
+    shelljs.exec(`az batch ${resourceType} create ${commandOptions}`, { async: true }, (code : number, stdout : string, stderr : string) => {
+        cleanup();
 
         if (code !== 0 || stderr) {  // TODO: figure out what to check (if anything) - problem is that the CLI can return exit code 0 on failure... but it writes to stderr on success too (the experimental feature warnings)
             output.appendLine(stderr);
@@ -131,7 +137,7 @@ function getParameterJson(parameterFile : IParameterFileInfo) : string {
     return '{}';
 }
 
-async function createTempParameterFile(jobTemplateInfo : batch.IBatchTemplate, knownParameters : batch.IParameterValue[]) : Promise<ITempFileInfo | undefined> {
+async function createTempParameterFile(jobTemplateInfo : batch.IBatchResource, knownParameters : batch.IParameterValue[]) : Promise<ITempFileInfo | undefined> {
     let parameterObject : any = {};
     for (const p of jobTemplateInfo.parameters) {
         const known = knownParameters.find((pv) => pv.name == p.name);

@@ -109,18 +109,25 @@ suite('Batch Utilities Tests', () => {
         assert.equal(result, null);
     });
 
-    test('Parsing a job JSON as a job template fails', () => {
+    test('Parsing job JSON returns a non-template resource', () => {
         const result = batch.parseBatchTemplate(jobJson, 'job');
-        assert.equal(result, null);
+        assert.notEqual(result, null);
+        if (result !== null) {
+          assert.equal(result.isTemplate, false);
+          assert.equal(result.parameters.length, 0);
+        }
     });
 
-    test('Parsing job template JSON as a job template succeeds', () => {
+    test('Parsing job template JSON returns a job resource template', () => {
         const template = batch.parseBatchTemplate(jobTemplateJson, 'job');
         assert.notEqual(template, null);
+        if (template !== null) {
+          assert.equal(template.isTemplate, true);
+        }
     });
 
     test('Parsing job template JSON surfaces the parameters', () => {
-        const template = <batch.IBatchTemplate>batch.parseBatchTemplate(jobTemplateJson, 'job');
+        const template = <batch.IBatchResource>batch.parseBatchTemplate(jobTemplateJson, 'job');
         assert.equal(template.parameters.length, 4);
         
         const jobIdParameter = template.parameters[0];
@@ -133,12 +140,12 @@ suite('Batch Utilities Tests', () => {
     });
 
     test('A job template can be parsed even if it has no parameters', () => {
-        const template = <batch.IBatchTemplate>batch.parseBatchTemplate(jobTemplateJsonNoParams, 'job');
+        const template = <batch.IBatchResource>batch.parseBatchTemplate(jobTemplateJsonNoParams, 'job');
         assert.equal(template.parameters.length, 0);
     });
 
     test('Parsing job template JSON captures default values', () => {
-        const template = <batch.IBatchTemplate>batch.parseBatchTemplate(jobTemplateJson, 'job');
+        const template = <batch.IBatchResource>batch.parseBatchTemplate(jobTemplateJson, 'job');
         
         const parameter = template.parameters.find((p) => p.name == 'testDefaulted');
 
@@ -149,7 +156,7 @@ suite('Batch Utilities Tests', () => {
     });
 
     test('Parsing job template JSON captures allowed values', () => {
-        const template = <batch.IBatchTemplate>batch.parseBatchTemplate(jobTemplateJson, 'job');
+        const template = <batch.IBatchResource>batch.parseBatchTemplate(jobTemplateJson, 'job');
         
         const parameter = template.parameters.find((p) => p.name == 'testAllowed');
 
@@ -164,7 +171,7 @@ suite('Batch Utilities Tests', () => {
     });
 
     test('Parsing pool template JSON surfaces the parameters', () => {
-        const template = <batch.IBatchTemplate>batch.parseBatchTemplate(poolTemplateJson, 'pool');
+        const template = <batch.IBatchResource>batch.parseBatchTemplate(poolTemplateJson, 'pool');
         assert.equal(template.parameters.length, 1);
         
         assert.equal('vmSize', template.parameters[0].name);
