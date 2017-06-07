@@ -1,0 +1,60 @@
+{
+  "name": "vscode-azure-batch-tools",
+  "displayName": "Azure Batch Tools for Visual Studio Code",
+  "description": "Commands for authoring and deploying Azure Batch resources",
+  "version": "0.0.1",
+  "publisher": "itowlson",
+  "engines": {
+    "vscode": "^1.12.0"
+  },
+ "repository": {
+    "type": "git",
+    "url": "https://github.com/Azure/vscode-azure-batch-tools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Azure/vscode-azure-batch-tools/issues"
+  },
+  "keywords": [
+    "azure",
+    "batch",
+    "cloud"
+  ],
+  "activationEvents": [
+    "onCommand:azure.batch.createJob",
+    "onCommand:azure.batch.createPool"
+  ],
+  "main": "./out/src/extension",
+  "contributes": {
+    "commands": [
+      {
+        "command": "azure.batch.createJob",
+        "title": "Create Batch Job",
+        "category": "Azure"
+      },
+      {
+        "command": "azure.batch.createPool",
+        "title": "Create Batch Pool",
+        "category": "Azure"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "tsc -p ./",
+    "compile": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "node ./node_modules/vscode/bin/test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^2.2.32",
+    "@types/node": "^6.0.40",
+    "@types/shelljs": "^0.7.1",
+    "@types/tmp": "0.0.33",
+    "mocha": "^2.3.3",
+    "typescript": "^2.0.3",
+    "vscode": "^1.0.0"
+  },
+  "dependencies": {
+    "shelljs": "^0.7.7",
+    "tmp": "^0.0.31"
+  }
+}
