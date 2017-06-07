@@ -1,0 +1,59 @@
+{
+    "Azure Batch Application Template": {
+        "prefix": "batch.apptemplate",
+        "body": [
+            "{",
+            "\t\"parameters\": {",
+            "\t},",
+            "\t\"onAllTasksComplete\": \"terminateJob\"",
+            "}"
+        ],
+        "description": "An application template for Azure Batch jobs"
+    },
+    "Azure Batch Task Per File Task Factory": {
+        "prefix": "batch.taskperfile",
+        "body": [
+            "\"taskFactory\": {",
+            "\t\"type\": \"taskPerFile\",",
+            "\t\"source\": {",
+            "\t\t\"fileGroup\": \"${1:fileGroup}\"",
+            "\t},",
+            "\t\"repeatTask\": {",
+            "\t\t\"commandLine\": \"${2:commandLine}\",",
+            "\t\t\"resourceFiles\": [],",
+            "\t\t\"outputFiles\": []",
+            "\t}",
+            "}"
+        ],
+        "description": "A task-per-file task factory for Azure Batch jobs"
+    },
+    "Azure Batch Parametric Sweep Task Factory": {
+        "prefix": "batch.parametricsweep",
+        "body": [
+            "\"taskFactory\": {",
+            "\t\"type\": \"parametricSweep\",",
+            "\t\"parameterSets\": [ {",
+            "\t\t\"start\": \"${1:start}\",",
+            "\t\t\"end\": \"${2:end}\",",
+            "\t\t\"step\": 1",
+            "\t} ],",
+            "\t\"repeatTask\": {",
+            "\t\t\"commandLine\": \"${3:commandLine}\",",
+            "\t\t\"resourceFiles\": [],",
+            "\t\t\"outputFiles\": []",
+            "\t}",
+            "}"
+        ],
+        "description": "A parametric sweep task factory for Azure Batch jobs"
+    },
+    "Azure Batch Task Collection Task Factory": {
+        "prefix": "batch.taskcollection",
+        "body": [
+            "\"taskFactory\": {",
+            "\t\"tasks\": []",
+            "\t}",
+            "}"
+        ],
+        "description": "A task collection task factory for Azure Batch jobs"
+    }
+}

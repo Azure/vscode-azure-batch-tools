@@ -36,6 +36,12 @@
         "title": "Create Batch Pool",
         "category": "Azure"
       }
+    ],
+    "snippets": [
+      {
+        "language": "json",
+        "path": "./snippet/job.json"
+      }
     ]
   },
   "scripts": {
