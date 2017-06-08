@@ -1,3 +1,8 @@
+import * as path from 'path';
+
+export function join(...paths : string[]) : string {
+    return path.join(...paths);
+}
 export function stripExtension(filePath : string) : string {
     // TODO: this will get it wrong if the file has no extension *and* the
     // directory path contains a directory with an extension. This isn't really
@@ -10,15 +15,7 @@ export function stripExtension(filePath : string) : string {
 }
 
 export function directory(filePath : string) : string {
-    const sepIndexFwd = filePath.lastIndexOf('/');
-    const sepIndexBwd = filePath.lastIndexOf('\\');
-    const sepIndex = (sepIndexFwd > sepIndexBwd) ? sepIndexFwd : sepIndexBwd;
-    
-    if (sepIndex < 0) {
-        return process.cwd();
-    }
-
-    return filePath.substr(0, sepIndex);
+    return path.dirname(filePath);
 }
 
 export function equal(filePath1 : string, filePath2 : string) : boolean {

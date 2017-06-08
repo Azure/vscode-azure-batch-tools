@@ -1,3 +1,6 @@
+import { IShellExecResult, ICommandError } from './shell';
+import * as duration from './duration';
+
 export function parseBatchTemplate(text : string, resourceType : BatchResourceType) : IBatchResource | null {
     
     try {
@@ -25,10 +28,14 @@ function looksLikeTemplate(json : any, resourceType : BatchResourceType) : boole
     }
 
     if (resourceDecl.type && resourceDecl.properties) {
-        return resourceDecl.type == "Microsoft.Batch/batchAccounts/" + plural(resourceType);
+        return resourceDecl.type == templateResourceType(resourceType);
     }
 
     return false;
+}
+
+function templateResourceType(resourceType : BatchResourceType) : string {
+    return "Microsoft.Batch/batchAccounts/" + plural(resourceType);
 }
 
 function plural(resourceType : BatchResourceType) : string {
@@ -87,6 +94,102 @@ function parseParametersCore(json : any) : IParameterValue[] {
     return parameters;
 }
 
+export async function listResources(shellExec : (command : string) => Promise<IShellExecResult>, resourceType : BatchResourceType) : Promise<IBatchResourceContent[] | ICommandError> {
+    //const command = `az batch ${resourceType} list --query [*].{id:id,displayName:displayName}`;  // the problem is we are going to want to stringify the resource JSON and that means we need to download it - or do a second call
+    const command = `az batch ${resourceType} list`;
+    const result = await shellExec(command);
+    if (result.exitCode === 0) {
+        return JSON.parse(result.output);
+    }
+    return { error : result.error };
+}
+
+export function makeTemplate(resource : any, resourceType : BatchResourceType) : any {
+
+    const filtered = removeProperties(resource, unsettableProperties(resourceType));
+    const durationised = transformProperties(filtered, durationProperties(resourceType), duration.toISO8601);
+    // TODO: strip defaults (particularly nulls or empty objects) - we get null-stripping as a side-effect of transformProperties but shouldn't rely on this!
+    const templateBody = durationised;
+
+    var template : any = {
+        parameters: { }
+    };
+
+    template[resourceType] = {
+        type: templateResourceType(resourceType),
+        apiVersion: '2017-05-01',
+        properties: templateBody
+    }
+
+    return template;
+}
+
+function removeProperties(resource : any, properties : string[]) : any {
+    var result : any = {};
+    for (const property in resource) {
+        if (properties.indexOf(property) < 0) {
+            result[property] = resource[property];
+        }
+    }
+    return result;
+}
+
+// function transformProperties(resource : any, properties : string[], transform : (original : string | undefined) => string | undefined) : any {
+//     var result : any = {};
+//     for (const property in resource) {
+//         const needsTransform = properties.indexOf(property) >= 0;
+//         const resultProperty = needsTransform ? transform(resource[property]) : resource[property];
+//         if (resultProperty) {
+//             result[property] = resultProperty;
+//         }
+//     }
+//     return result;    
+// }
+
+function transformProperties(obj : any, properties: string[], transform : (original : string | undefined) => string | undefined) : any {
+    var result : any = {};
+    for (const property in obj) {
+        if (obj[property] instanceof Object) {
+            result[property] = transformProperties(obj[property], properties, transform);
+        } else {
+            const needsTransform = properties.indexOf(property) >= 0;
+            const resultProperty = needsTransform ? transform(obj[property]) : obj[property];
+            if (resultProperty) {
+                result[property] = resultProperty;
+            }
+        }
+    }
+    return result;
+}
+
+// This isn't ideal since it doesn't cover property paths, but it will do
+function durationProperties(resourceType : BatchResourceType) : string[] {
+    switch (resourceType) {
+        case 'job':
+            return [ 'maxWallClockTime' ];
+        default:
+            throw `unknown resource type ${resourceType}`;
+    }
+}
+
+function unsettableProperties(resourceType : BatchResourceType) : string[] {
+    // TODO: better plan might be to whitelist properties by using the Swagger spec
+    // for the 'add' models.
+    const commonUnsettableProperties = ["odata.metadata", "url", "eTag", "lastModified", "creationTime", "state", "stateTransitionTime", "previousState", "previousStateTransitionTime"];
+    return commonUnsettableProperties.concat(unsettablePropertiesCore(resourceType));
+}
+
+function unsettablePropertiesCore(resourceType : BatchResourceType) : string[] {
+    // TODO: better plan might be to whitelist properties by using the Swagger spec
+    // for the 'add' models.
+    switch (resourceType) {
+        case 'job':
+            return ["executionInfo", "stats"];
+        default:
+            throw `unknown resource type ${resourceType}`;
+    }
+}
+
 export interface IBatchResource {
     readonly isTemplate : boolean;
     readonly parameters : IBatchTemplateParameter[];
@@ -109,6 +212,11 @@ export type BatchTemplateParameterDataType = 'int' | 'string' | 'bool';
 export interface IParameterValue {
     readonly name : string;
     readonly value : any;
+}
+
+export interface IBatchResourceContent {
+    readonly id : string;
+    readonly displayName? : string;
 }
 
 export type BatchResourceType = 'job' | 'pool';

@@ -21,7 +21,8 @@
   ],
   "activationEvents": [
     "onCommand:azure.batch.createJob",
-    "onCommand:azure.batch.createPool"
+    "onCommand:azure.batch.createPool",
+    "onCommand:azure.batch.createTemplateFromJob"
   ],
   "main": "./out/src/extension",
   "contributes": {
@@ -34,6 +35,11 @@
       {
         "command": "azure.batch.createPool",
         "title": "Create Batch Pool",
+        "category": "Azure"
+      },
+      {
+        "command": "azure.batch.createTemplateFromJob",
+        "title": "Create Batch Template from Job",
         "category": "Azure"
       }
     ],

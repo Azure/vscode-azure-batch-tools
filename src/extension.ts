@@ -7,6 +7,7 @@ import * as tmp from 'tmp';
 
 import * as path from './path';
 import * as batch from './batch';
+import * as shell from './shell';
 
 var output : vscode.OutputChannel = vscode.window.createOutputChannel('Azure Batch');
 
@@ -14,7 +15,8 @@ export function activate(context: vscode.ExtensionContext) {
 
     let disposables = [
         vscode.commands.registerCommand('azure.batch.createJob', createJob),
-        vscode.commands.registerCommand('azure.batch.createPool', createPool)
+        vscode.commands.registerCommand('azure.batch.createPool', createPool),
+        vscode.commands.registerCommand('azure.batch.createTemplateFromJob', createTemplateFromJob)
     ];
 
     disposables.forEach((d) => context.subscriptions.push(d), this);
@@ -184,6 +186,57 @@ function quickPickFor(value : any) : AllowedValueQuickPickItem {
         label: String(value),
         description: '',
         value: value
+    };
+}
+
+async function createTemplateFromJob() {
+    const resourceType : batch.BatchResourceType = 'job';
+    const resourceTypePlural = 'jobs';
+
+    output.appendLine(`Getting list of ${resourceTypePlural} from account...`);
+
+    const resources = await batch.listResources(shell.exec, resourceType);
+
+    if (shell.isCommandError(resources)) {
+        output.appendLine(`Error getting ${resourceTypePlural} from account\n\nDetails:\n\n` + resources.error);
+        return;
+    }
+
+    const quickPicks = resources.map((j) => quickPickForResource(j));
+    const pick = await vscode.window.showQuickPick(quickPicks);
+
+    if (pick) {
+        const resource = pick.value;
+        const template = batch.makeTemplate(resource, resourceType);
+        const filename = resource.id + `.${resourceType}template.json`;
+        createFile(filename, JSON.stringify(template, null, 2));
+
+        // ask which properties they want to templatise (how? does VSC have a multi-select UI or do we use the text editor?)
+        // oh, we could have a 'convert to parameter' command
+    }
+}
+
+async function createFile(filename : string, content : string) : Promise<void> {
+    const filepath = path.join(vscode.workspace.rootPath || process.cwd(), filename);
+
+    const doc = await vscode.workspace.openTextDocument(vscode.Uri.parse('untitled:' + filepath));
+
+    const start = new vscode.Position(0, 0),
+        end = new vscode.Position(0, 0),
+        range = new vscode.Range(start, end),
+        edit = new vscode.TextEdit(range, content),
+        wsEdit = new vscode.WorkspaceEdit();
+
+    wsEdit.set(doc.uri, [edit]);
+    await vscode.workspace.applyEdit(wsEdit);
+    await vscode.window.showTextDocument(doc);
+}
+
+function quickPickForResource(resource: batch.IBatchResourceContent) : AllowedValueQuickPickItem {
+    return {
+        label: resource.id,
+        description: resource.displayName || '',
+        value: resource
     };
 }
 

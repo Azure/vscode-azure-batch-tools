@@ -10,6 +10,7 @@ import * as assert from 'assert';
 // as well as import your extension to test it
 import * as vscode from 'vscode';
 import * as batch from '../src/batch';
+import * as duration from '../src/duration';
 
 const nonJson = " \
   id : 'wonderjob' \
@@ -176,4 +177,29 @@ suite('Batch Utilities Tests', () => {
         
         assert.equal('vmSize', template.parameters[0].name);
     });
+});
+
+suite('Duration Parsing Tests', () => {
+
+    test('Parsing a plain time succeeds', () => {
+        assert.equal('PT5H', duration.toISO8601('5:00:00'));
+        assert.equal('PT10M', duration.toISO8601('0:10:00'));
+        assert.equal('PT30S', duration.toISO8601('0:00:30'));
+        assert.equal('PT45H10M30S', duration.toISO8601('45:10:30'));
+        assert.equal('PT45H10M30.5S', duration.toISO8601('45:10:30.50'));
+    });
+
+    test('Parsing a time containing days succeeds', () => {
+        assert.equal('P1DT5H', duration.toISO8601('1 day, 5:00:00'));
+        assert.equal('P15DT45H10M30.5S', duration.toISO8601('15 days, 45:10:30.50'));
+    });
+
+    test('Parsing a zero time succeeds', () => {
+        assert.equal('PT0S', duration.toISO8601('0:00:00'));
+    });
+
+    test('Parsing a MaxValue time returns nothing', () => {
+        assert.equal(undefined, duration.toISO8601('10675199 days, 2:48:05.477581'));
+    });
+
 });
