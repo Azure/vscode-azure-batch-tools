@@ -16,7 +16,8 @@ export function activate(context: vscode.ExtensionContext) {
     let disposables = [
         vscode.commands.registerCommand('azure.batch.createJob', createJob),
         vscode.commands.registerCommand('azure.batch.createPool', createPool),
-        vscode.commands.registerCommand('azure.batch.createTemplateFromJob', createTemplateFromJob)
+        vscode.commands.registerCommand('azure.batch.createTemplateFromJob', createTemplateFromJob),
+        vscode.commands.registerCommand('azure.batch.convertToParameter', convertToParameter)
     ];
 
     disposables.forEach((d) => context.subscriptions.push(d), this);
@@ -238,6 +239,124 @@ function quickPickForResource(resource: batch.IBatchResourceContent) : AllowedVa
         description: resource.displayName || '',
         value: resource
     };
+}
+
+async function convertToParameter() {
+
+    const activeEditor = vscode.window.activeTextEditor;
+    if (!activeEditor) {
+        return;
+    }
+
+    const document = activeEditor.document;
+    if (!document) {
+        return;
+    }
+
+    const selection = activeEditor.selection;
+    if (!selection) {
+        return;
+    }
+
+    const jsonSymbols = await getJsonSymbols(document);
+    if (jsonSymbols.length === 0) {
+        return;
+    }
+
+    const property = findProperty(jsonSymbols, selection.anchor);
+    if (!property) {
+        return;
+    }
+
+    const propertyContainerName = property.containerName;
+    if (!propertyContainerName.startsWith('job.properties')) {  // <- TODO
+        return;
+    }
+
+    // TODO: we really want to do this only for leaf properties
+
+    const propertyLocation = property.location.range;
+    const propertyText = document.getText(propertyLocation);
+    const nameBitLength = propertyText.indexOf(':') + 1;
+    if (nameBitLength <= 0) {
+        return;
+    }
+    const propertyValueLocation = new vscode.Range(propertyLocation.start.translate(0, nameBitLength), propertyLocation.end);
+    const propertyValue = JSON.parse(document.getText(propertyValueLocation));
+
+    const propertyType = getParameterTypeName(propertyValue); // consider getting this from Swagger?
+
+    const parametersElement = jsonSymbols.find((s) => s.name == 'parameters' && !s.containerName);
+    const needToCreateParametersElement = !parametersElement;
+
+    // TODO: investigate using a smart insert for this (https://github.com/Microsoft/vscode/issues/3210)
+    const newParameterDefn : any = {
+        type: propertyType,
+        defaultValue: propertyValue,
+        metadata: { description: `Value for ${property.containerName}.${property.name}` }
+    }
+
+    let insertParamDefn : vscode.TextEdit;
+
+    if (parametersElement) {
+        const newParameterDefnText = `"${property.name}": ${JSON.stringify(newParameterDefn, null, 2)}`;
+        const alreadyHasParameters = jsonSymbols.some((s) => s.containerName == 'parameters');
+        const insert = (alreadyHasParameters ? ',\n' : '') + newParameterDefnText;  // TODO: line ending
+
+        // insert this at the end of the parameters section
+        const start = parametersElement.location.range.end.translate(0, -1),
+            end = start,
+            range = new vscode.Range(start, end);
+
+        insertParamDefn = new vscode.TextEdit(range, insert);
+    } else {
+        let parameters : any = {};
+        parameters[property.name] = newParameterDefn;
+        const parametersSection = JSON.stringify({ parameters: parameters }, null, 2) + ',\n';  // TODO: line ending?
+        // insert this at the top of the document, with suitable commas
+        const start = new vscode.Position(1, 0),
+            end = new vscode.Position(1, 0),
+            range = new vscode.Range(start, end);
+
+        insertParamDefn = new vscode.TextEdit(range, parametersSection);
+    }
+
+    const replaceValueWithParamRef = new vscode.TextEdit(propertyValueLocation, ` "[parameters('${property.name}')]"`);
+
+    const wsEdit = new vscode.WorkspaceEdit();
+
+    wsEdit.set(document.uri, [insertParamDefn, replaceValueWithParamRef]);
+    await vscode.workspace.applyEdit(wsEdit);
+
+    activeEditor.revealRange(insertParamDefn.range);
+    activeEditor.selection = new vscode.Selection(insertParamDefn.range.start, insertParamDefn.range.end);  // TODO: this ends on the comma beforehand...
+}
+
+async function getJsonSymbols(document : vscode.TextDocument) : Promise<vscode.SymbolInformation[]> {
+    const sis : any = await vscode.commands.executeCommand('vscode.executeDocumentSymbolProvider', document.uri);
+    
+    if (sis && sis.length) {
+        return sis;
+    }
+
+    return [];
+}
+
+function findProperty(symbols: vscode.SymbolInformation[], position: vscode.Position) : vscode.SymbolInformation | null {
+    const containingSymbols = symbols.filter((s) => s.location.range.contains(position));
+    if (!containingSymbols || containingSymbols.length === 0) {
+        return null;
+    }
+    // TODO: is it always the last one in the collection?  Not sure what guarantees we have...
+    const sorted = containingSymbols.sort((a, b) => (a.containerName || '').length - (b.containerName || '').length);
+    return sorted[sorted.length - 1];
+}
+
+function getParameterTypeName(value : any) : string {
+    return (value instanceof Number || typeof value == 'number') ? 'integer' :
+        (value instanceof Boolean || typeof value == 'boolean') ? 'boolean' :
+        (value instanceof String || typeof value == 'string') ? 'string' :
+        'object';
 }
 
 interface AllowedValueQuickPickItem extends vscode.QuickPickItem {
