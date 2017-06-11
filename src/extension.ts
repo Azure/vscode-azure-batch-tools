@@ -17,6 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('azure.batch.createJob', createJob),
         vscode.commands.registerCommand('azure.batch.createPool', createPool),
         vscode.commands.registerCommand('azure.batch.createTemplateFromJob', createTemplateFromJob),
+        vscode.commands.registerCommand('azure.batch.createTemplateFromPool', createTemplateFromPool),
         vscode.commands.registerCommand('azure.batch.convertToParameter', convertToParameter)
     ];
 
@@ -193,6 +194,16 @@ function quickPickFor(value : any) : AllowedValueQuickPickItem {
 async function createTemplateFromJob() {
     const resourceType : batch.BatchResourceType = 'job';
     const resourceTypePlural = 'jobs';
+    await createTemplateFromResource(resourceType, resourceTypePlural);
+}
+
+async function createTemplateFromPool() {
+    const resourceType : batch.BatchResourceType = 'pool';
+    const resourceTypePlural = 'pools';
+    await createTemplateFromResource(resourceType, resourceTypePlural);
+}
+
+async function createTemplateFromResource(resourceType : batch.BatchResourceType, resourceTypePlural : string) {
 
     output.appendLine(`Getting list of ${resourceTypePlural} from account...`);
 
@@ -211,9 +222,6 @@ async function createTemplateFromJob() {
         const template = batch.makeTemplate(resource, resourceType);
         const filename = resource.id + `.${resourceType}template.json`;
         createFile(filename, JSON.stringify(template, null, 2));
-
-        // ask which properties they want to templatise (how? does VSC have a multi-select UI or do we use the text editor?)
-        // oh, we could have a 'convert to parameter' command
     }
 }
 

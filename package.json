@@ -23,6 +23,7 @@
     "onCommand:azure.batch.createJob",
     "onCommand:azure.batch.createPool",
     "onCommand:azure.batch.createTemplateFromJob",
+    "onCommand:azure.batch.createTemplateFromPool",
     "onCommand:azure.batch.convertToParameter"
   ],
   "main": "./out/src/extension",
@@ -41,6 +42,11 @@
       {
         "command": "azure.batch.createTemplateFromJob",
         "title": "Create Batch Template from Job",
+        "category": "Azure"
+      },
+      {
+        "command": "azure.batch.createTemplateFromPool",
+        "title": "Create Batch Template from Pool",
         "category": "Azure"
       },
       {

@@ -134,18 +134,6 @@ function removeProperties(resource : any, properties : string[]) : any {
     return result;
 }
 
-// function transformProperties(resource : any, properties : string[], transform : (original : string | undefined) => string | undefined) : any {
-//     var result : any = {};
-//     for (const property in resource) {
-//         const needsTransform = properties.indexOf(property) >= 0;
-//         const resultProperty = needsTransform ? transform(resource[property]) : resource[property];
-//         if (resultProperty) {
-//             result[property] = resultProperty;
-//         }
-//     }
-//     return result;    
-// }
-
 function transformProperties(obj : any, properties: string[], transform : (original : string | undefined) => string | undefined) : any {
     var result : any = {};
     for (const property in obj) {
@@ -154,7 +142,7 @@ function transformProperties(obj : any, properties: string[], transform : (origi
         } else {
             const needsTransform = properties.indexOf(property) >= 0;
             const resultProperty = needsTransform ? transform(obj[property]) : obj[property];
-            if (resultProperty) {
+            if (resultProperty !== undefined && resultProperty !== null) {
                 result[property] = resultProperty;
             }
         }
@@ -167,6 +155,8 @@ function durationProperties(resourceType : BatchResourceType) : string[] {
     switch (resourceType) {
         case 'job':
             return [ 'maxWallClockTime' ];
+        case 'pool':
+            return [ 'resizeTimeout' ];
         default:
             throw `unknown resource type ${resourceType}`;
     }
@@ -185,6 +175,8 @@ function unsettablePropertiesCore(resourceType : BatchResourceType) : string[] {
     switch (resourceType) {
         case 'job':
             return ["executionInfo", "stats"];
+        case 'pool':
+            return ["allocationState", "allocationStateTransitionTime", "resizeErrors", "currentDedicatedNodes", "currentLowPriorityNodes", "autoScaleRun", "stats"];
         default:
             throw `unknown resource type ${resourceType}`;
     }
