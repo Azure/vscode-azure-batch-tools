@@ -22,20 +22,11 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('azure.batch.createTemplateFromJob', createTemplateFromJob),
         vscode.commands.registerCommand('azure.batch.createTemplateFromPool', createTemplateFromPool),
         vscode.commands.registerCommand('azure.batch.convertToParameter', convertToParameter),
-        vscode.commands.registerCommand('azure.batch.get', (node: azurebatchtree.AzureBatchTreeNode) => {
-            vscode.workspace.openTextDocument(node.uri).then((doc) => vscode.window.showTextDocument(doc));
-        }),
-        vscode.commands.registerCommand('azure.batch.getAsTemplate', (node: azurebatchtree.AzureBatchTreeNode) => {
-            // TODO: horrible smearing of responsibilities and duplication of code across this
-            // and the get command - rationalise!
-            const uri = node.uri;
-            const resourceType = <batch.BatchResourceType> uri.authority;
-            const id : string = uri.path.substring(0, uri.path.length - '.json'.length).substr(1);
-            createTemplateFromSpecificResource(resourceType, id);
-        }),
+        vscode.commands.registerCommand('azure.batch.get', viewnodeGet),
+        vscode.commands.registerCommand('azure.batch.getAsTemplate', viewnodeGetAsTemplate),
         vscode.commands.registerCommand('azure.batch.refresh', () => {vscode.window.showWarningMessage('not implemented');}),
         vscode.window.registerTreeDataProvider('azure.batch.explorer', azureBatchProvider),
-        vscode.workspace.registerTextDocumentContentProvider('ab', azureBatchProvider)
+        vscode.workspace.registerTextDocumentContentProvider(azurebatchtree.UriScheme, azureBatchProvider)
     ];
 
     disposables.forEach((d) => context.subscriptions.push(d), this);
@@ -392,6 +383,20 @@ function getParameterTypeName(value : any) : string {
         (value instanceof Boolean || typeof value == 'boolean') ? 'boolean' :
         (value instanceof String || typeof value == 'string') ? 'string' :
         'object';
+}
+
+async function viewnodeGet(node : azurebatchtree.AzureBatchTreeNode) {
+    const document = await vscode.workspace.openTextDocument(node.uri)
+    vscode.window.showTextDocument(document);
+}
+
+async function viewnodeGetAsTemplate(node : azurebatchtree.AzureBatchTreeNode) {
+    // TODO: horrible smearing of responsibilities and duplication of code across this
+    // and the get command - rationalise!
+    const uri = node.uri;
+    const resourceType = <batch.BatchResourceType> uri.authority;
+    const id : string = uri.path.substring(0, uri.path.length - '.json'.length).substr(1);
+    await createTemplateFromSpecificResource(resourceType, id);
 }
 
 interface AllowedValueQuickPickItem extends vscode.QuickPickItem {

@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import * as batch from './batch';
 import * as shell from './shell';
 
+export const UriScheme : string = 'ab';
+
 export class AzureBatchProvider implements vscode.TreeDataProvider<AzureBatchTreeNode>, vscode.TextDocumentContentProvider {
     getTreeItem(abtn : AzureBatchTreeNode) : vscode.TreeItem {
         const collapsibleState = abtn.kind == 'root' ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None;
@@ -65,11 +67,11 @@ type AbtnKind = 'root' | 'resource';
 class RootNode implements AzureBatchTreeNode {
     constructor(readonly text : string, readonly resourceType : batch.BatchResourceType) { }
     readonly kind : AbtnKind = 'root';
-    readonly uri : vscode.Uri = vscode.Uri.parse('ab://');
+    readonly uri : vscode.Uri = vscode.Uri.parse(`${UriScheme}://`);
 }
 
 class ResourceNode implements AzureBatchTreeNode {
     constructor(readonly text : string, readonly resourceType : batch.BatchResourceType, readonly resource : any) { }
     readonly kind : AbtnKind = 'resource';
-    readonly uri : vscode.Uri = vscode.Uri.parse(`ab://${this.resourceType}/${this.resource.id}.json`)
+    readonly uri : vscode.Uri = vscode.Uri.parse(`${UriScheme}://${this.resourceType}/${this.resource.id}.json`)
 }
