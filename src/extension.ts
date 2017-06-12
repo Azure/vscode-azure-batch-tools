@@ -22,10 +22,13 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('azure.batch.createTemplateFromJob', createTemplateFromJob),
         vscode.commands.registerCommand('azure.batch.createTemplateFromPool', createTemplateFromPool),
         vscode.commands.registerCommand('azure.batch.convertToParameter', convertToParameter),
-        vscode.commands.registerCommand('azure.batch.get', (node) => {}),
+        vscode.commands.registerCommand('azure.batch.get', (node: azurebatchtree.AzureBatchTreeNode) => {
+            vscode.workspace.openTextDocument(node.uri).then((doc) => vscode.window.showTextDocument(doc));
+        }),
         vscode.commands.registerCommand('azure.batch.getAsTemplate', (node) => {}),
         vscode.commands.registerCommand('azure.batch.refresh', () => {}),
-        vscode.window.registerTreeDataProvider('azure.batch.explorer', azureBatchProvider)
+        vscode.window.registerTreeDataProvider('azure.batch.explorer', azureBatchProvider),
+        vscode.workspace.registerTextDocumentContentProvider('ab', azureBatchProvider)
     ];
 
     disposables.forEach((d) => context.subscriptions.push(d), this);

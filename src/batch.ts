@@ -104,6 +104,19 @@ export async function listResources(shellExec : (command : string) => Promise<IS
     return { error : result.error };
 }
 
+export async function getResource(shellExec : (command : string) => Promise<IShellExecResult>, resourceType : BatchResourceType, id : string) : Promise<IBatchResourceContent | ICommandError> {
+    const command = `az batch ${resourceType} show --${resourceType}-id ${id}`;
+    const result = await shellExec(command);
+    if (result.exitCode === 0) {
+        const raw = JSON.parse(result.output);
+        // TODO: we have an inconsistency here where getResource fixes up empty
+        // and mangled properties on the way, but listResources does not - rationalise!
+        const durationised = transformProperties(raw, durationProperties(resourceType), duration.toISO8601);
+        return durationised;
+    }
+    return { error : result.error };
+}
+
 export function makeTemplate(resource : any, resourceType : BatchResourceType) : any {
 
     const filtered = removeProperties(resource, unsettableProperties(resourceType));
