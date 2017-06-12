@@ -5,7 +5,7 @@
   "version": "0.0.1",
   "publisher": "itowlson",
   "engines": {
-    "vscode": "^1.12.0"
+    "vscode": "^1.13.0"
   },
  "repository": {
     "type": "git",
@@ -24,7 +24,8 @@
     "onCommand:azure.batch.createPool",
     "onCommand:azure.batch.createTemplateFromJob",
     "onCommand:azure.batch.createTemplateFromPool",
-    "onCommand:azure.batch.convertToParameter"
+    "onCommand:azure.batch.convertToParameter",
+    "onView:azure.batch.explorer"
   ],
   "main": "./out/src/extension",
   "contributes": {
@@ -53,14 +54,53 @@
         "command": "azure.batch.convertToParameter",
         "title": "Convert to Batch Template Parameter",
         "category": "Azure"
-      }
+      },
+			{
+				"command": "azure.batch.get",
+				"title": "Get"
+			},
+			{
+				"command": "azure.batch.getAsTemplate",
+				"title": "Get as Template"
+			},
+			{
+				"command": "azure.batch.refresh",
+				"title": "Refresh"
+			}
     ],
     "snippets": [
       {
         "language": "json",
         "path": "./snippet/job.json"
       }
-    ]
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "azure.batch.explorer",
+          "name": "Azure Batch"
+        }
+      ]
+    },
+    "menus":{
+      "view/title" : [
+        {
+          "command" : "azure.batch.refresh",
+          "when": "view == azure.batch.explorer",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "azure.batch.get",
+          "when": "view == azure.batch.explorer && viewItem == azure.batch.resource"
+        },
+        {
+          "command": "azure.batch.getAsTemplate",
+          "when": "view == azure.batch.explorer && viewItem == azure.batch.resource"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "tsc -p ./",

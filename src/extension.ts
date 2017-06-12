@@ -8,17 +8,24 @@ import * as tmp from 'tmp';
 import * as path from './path';
 import * as batch from './batch';
 import * as shell from './shell';
+import * as azurebatchtree from './azurebatchtree';
 
 var output : vscode.OutputChannel = vscode.window.createOutputChannel('Azure Batch');
 
 export function activate(context: vscode.ExtensionContext) {
+
+    const azureBatchProvider = new azurebatchtree.AzureBatchProvider();
 
     let disposables = [
         vscode.commands.registerCommand('azure.batch.createJob', createJob),
         vscode.commands.registerCommand('azure.batch.createPool', createPool),
         vscode.commands.registerCommand('azure.batch.createTemplateFromJob', createTemplateFromJob),
         vscode.commands.registerCommand('azure.batch.createTemplateFromPool', createTemplateFromPool),
-        vscode.commands.registerCommand('azure.batch.convertToParameter', convertToParameter)
+        vscode.commands.registerCommand('azure.batch.convertToParameter', convertToParameter),
+        vscode.commands.registerCommand('azure.batch.get', (node) => {}),
+        vscode.commands.registerCommand('azure.batch.getAsTemplate', (node) => {}),
+        vscode.commands.registerCommand('azure.batch.refresh', () => {}),
+        vscode.window.registerTreeDataProvider('azure.batch.explorer', azureBatchProvider)
     ];
 
     disposables.forEach((d) => context.subscriptions.push(d), this);
