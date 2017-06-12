@@ -24,7 +24,7 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('azure.batch.convertToParameter', convertToParameter),
         vscode.commands.registerCommand('azure.batch.get', viewnodeGet),
         vscode.commands.registerCommand('azure.batch.getAsTemplate', viewnodeGetAsTemplate),
-        vscode.commands.registerCommand('azure.batch.refresh', () => {vscode.window.showWarningMessage('not implemented');}),
+        vscode.commands.registerCommand('azure.batch.refresh', () => azureBatchProvider.refresh()),
         vscode.window.registerTreeDataProvider('azure.batch.explorer', azureBatchProvider),
         vscode.workspace.registerTextDocumentContentProvider(azurebatchtree.UriScheme, azureBatchProvider)
     ];

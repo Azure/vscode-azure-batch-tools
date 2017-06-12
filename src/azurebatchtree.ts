@@ -5,6 +5,8 @@ import * as shell from './shell';
 export const UriScheme : string = 'ab';
 
 export class AzureBatchProvider implements vscode.TreeDataProvider<AzureBatchTreeNode>, vscode.TextDocumentContentProvider {
+	private _onDidChangeTreeData: vscode.EventEmitter<AzureBatchTreeNode | undefined> = new vscode.EventEmitter<AzureBatchTreeNode | undefined>();
+	readonly onDidChangeTreeData: vscode.Event<AzureBatchTreeNode | undefined> = this._onDidChangeTreeData.event;
     getTreeItem(abtn : AzureBatchTreeNode) : vscode.TreeItem {
         const collapsibleState = abtn.kind == 'root' ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None;
         let item = new vscode.TreeItem(abtn.text, collapsibleState);
@@ -45,6 +47,9 @@ export class AzureBatchProvider implements vscode.TreeDataProvider<AzureBatchTre
         }
         return JSON.stringify(getResult, null, 2);
     }
+    refresh(): void {
+		this._onDidChangeTreeData.fire();
+	}
 }
 
 function isRootNode(node : AzureBatchTreeNode) : node is RootNode {
