@@ -236,17 +236,20 @@ async function createTemplateFromResource(resourceType : batch.BatchResourceType
 
     if (pick) {
         const resource = pick.value;
-        const template = batch.makeTemplate(resource, resourceType);
-        const filename = resource.id + `.${resourceType}template.json`;
-        createFile(filename, JSON.stringify(template, null, 2));
+        await createTemplateFile(resourceType, resource, resource.id);
     }
 }
 
 async function createTemplateFromSpecificResource(resourceType: batch.BatchResourceType, id : string) {
     const resource = await batch.getResource(shell.exec, resourceType, id);
-    const template = batch.makeTemplate(resource, resourceType);  // TODO: this puts it through the durationiser twice which results in manglage
+    await createTemplateFile(resourceType, resource, id);
+}
+
+async function createTemplateFile(resourceType : batch.BatchResourceType, resource : any, id : string) {
+    const template = batch.makeTemplate(resource, resourceType);
     const filename = id + `.${resourceType}template.json`;
     createFile(filename, JSON.stringify(template, null, 2));
+   
 }
 
 async function createFile(filename : string, content : string) : Promise<void> {
