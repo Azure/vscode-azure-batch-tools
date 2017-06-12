@@ -99,7 +99,9 @@ export async function listResources(shellExec : (command : string) => Promise<IS
     const command = `az batch ${resourceType} list`;
     const result = await shellExec(command);
     if (result.exitCode === 0) {
-        return JSON.parse(result.output);
+        const raw : any[] = JSON.parse(result.output);
+        const durationised = raw.map((r) => transformProperties(r, durationProperties(resourceType), duration.toISO8601));
+        return durationised;
     }
     return { error : result.error };
 }
@@ -109,8 +111,6 @@ export async function getResource(shellExec : (command : string) => Promise<IShe
     const result = await shellExec(command);
     if (result.exitCode === 0) {
         const raw = JSON.parse(result.output);
-        // TODO: we have an inconsistency here where getResource fixes up empty
-        // and mangled properties on the way, but listResources does not - rationalise!
         const durationised = transformProperties(raw, durationProperties(resourceType), duration.toISO8601);
         return durationised;
     }
@@ -120,9 +120,8 @@ export async function getResource(shellExec : (command : string) => Promise<IShe
 export function makeTemplate(resource : any, resourceType : BatchResourceType) : any {
 
     const filtered = removeProperties(resource, unsettableProperties(resourceType));
-    const durationised = transformProperties(filtered, durationProperties(resourceType), duration.toISO8601);
     // TODO: strip defaults (particularly nulls or empty objects) - we get null-stripping as a side-effect of transformProperties but shouldn't rely on this!
-    const templateBody = durationised;
+    const templateBody = filtered;
 
     var template : any = {
         parameters: { }

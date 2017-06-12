@@ -25,8 +25,15 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('azure.batch.get', (node: azurebatchtree.AzureBatchTreeNode) => {
             vscode.workspace.openTextDocument(node.uri).then((doc) => vscode.window.showTextDocument(doc));
         }),
-        vscode.commands.registerCommand('azure.batch.getAsTemplate', (node) => {}),
-        vscode.commands.registerCommand('azure.batch.refresh', () => {}),
+        vscode.commands.registerCommand('azure.batch.getAsTemplate', (node: azurebatchtree.AzureBatchTreeNode) => {
+            // TODO: horrible smearing of responsibilities and duplication of code across this
+            // and the get command - rationalise!
+            const uri = node.uri;
+            const resourceType = <batch.BatchResourceType> uri.authority;
+            const id : string = uri.path.substring(0, uri.path.length - '.json'.length).substr(1);
+            createTemplateFromSpecificResource(resourceType, id);
+        }),
+        vscode.commands.registerCommand('azure.batch.refresh', () => {vscode.window.showWarningMessage('not implemented');}),
         vscode.window.registerTreeDataProvider('azure.batch.explorer', azureBatchProvider),
         vscode.workspace.registerTextDocumentContentProvider('ab', azureBatchProvider)
     ];
@@ -233,6 +240,13 @@ async function createTemplateFromResource(resourceType : batch.BatchResourceType
         const filename = resource.id + `.${resourceType}template.json`;
         createFile(filename, JSON.stringify(template, null, 2));
     }
+}
+
+async function createTemplateFromSpecificResource(resourceType: batch.BatchResourceType, id : string) {
+    const resource = await batch.getResource(shell.exec, resourceType, id);
+    const template = batch.makeTemplate(resource, resourceType);  // TODO: this puts it through the durationiser twice which results in manglage
+    const filename = id + `.${resourceType}template.json`;
+    createFile(filename, JSON.stringify(template, null, 2));
 }
 
 async function createFile(filename : string, content : string) : Promise<void> {
