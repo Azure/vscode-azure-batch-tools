@@ -9,8 +9,7 @@ import * as path from './path';
 import * as batch from './batch';
 import * as shell from './shell';
 import * as azurebatchtree from './azurebatchtree';
-
-var output : vscode.OutputChannel = vscode.window.createOutputChannel('Azure Batch');
+import * as host from './host';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -94,19 +93,18 @@ async function createResourceImpl(doc : vscode.TextDocument, resourceType : batc
         `--template "${doc.fileName}" --parameters "${parameterFilePath}"` :
         `--json-file "${doc.fileName}"`;
 
-    output.show();
-    output.appendLine(`Creating Azure Batch ${resourceType}...`);
+    host.writeOutput(`Creating Azure Batch ${resourceType}...`);
 
     shelljs.exec(`az batch ${resourceType} create ${commandOptions}`, { async: true }, (code : number, stdout : string, stderr : string) => {
         cleanup();
 
         if (code !== 0 || stderr) {  // TODO: figure out what to check (if anything) - problem is that the CLI can return exit code 0 on failure... but it writes to stderr on success too (the experimental feature warnings)
-            output.appendLine(stderr);
+            host.writeOutput(stderr);
         } else {
-            output.appendLine(stdout);
+            host.writeOutput(stdout);
         }
 
-        output.appendLine("Done");
+        host.writeOutput("Done");
     });
 
 }
@@ -213,12 +211,12 @@ async function createTemplateFromPool() {
 
 async function createTemplateFromResource(resourceType : batch.BatchResourceType, resourceTypePlural : string) {
 
-    output.appendLine(`Getting list of ${resourceTypePlural} from account...`);
+    host.writeOutput(`Getting list of ${resourceTypePlural} from account...`);
 
     const resources = await batch.listResources(shell.exec, resourceType);
 
     if (shell.isCommandError(resources)) {
-        output.appendLine(`Error getting ${resourceTypePlural} from account\n\nDetails:\n\n` + resources.error);
+        host.writeOutput(`Error getting ${resourceTypePlural} from account\n\nDetails:\n\n` + resources.error);
         return;
     }
 
@@ -325,21 +323,24 @@ async function convertToParameter() {
     let insertParamDefn : vscode.TextEdit;
 
     if (parametersElement) {
-        const newParameterDefnText = `"${property.name}": ${JSON.stringify(newParameterDefn, null, 2)}`;
-        const alreadyHasParameters = jsonSymbols.some((s) => s.containerName == 'parameters');
-        const insert = (alreadyHasParameters ? ',\n' : '') + newParameterDefnText;  // TODO: line ending
+        const rawNewParameterDefnText = `"${property.name}": ${JSON.stringify(newParameterDefn, null, 2)}`;
+        const lastExistingParameter = jsonSymbols.reverse().find((s) => s.containerName == 'parameters');  // TODO: order guarantees?
+        const indentAmount = lastExistingParameter ? lastExistingParameter.location.range.start.character : parametersElement.location.range.start.character + 2;
+        const newParameterDefnText = indentLines(rawNewParameterDefnText, indentAmount);
+        const parametersElementOnOneLine = parametersElement.location.range.start.line == parametersElement.location.range.end.line;
+        const insert = (lastExistingParameter ? ',\n' : (parametersElementOnOneLine ? '\n' : '')) + newParameterDefnText + (parametersElementOnOneLine ? ('\n' + ' '.repeat(parametersElement.location.range.start.character)) : (lastExistingParameter ? '' : ('\n' + ' '.repeat(parametersElement.location.range.start.character))));  // TODO: line ending
 
-        // insert this at the end of the parameters section
-        const start = parametersElement.location.range.end.translate(0, -1),
-            end = start,
-            range = new vscode.Range(start, end);
+        const insertPos = (lastExistingParameter ? lastExistingParameter.location.range.end : parametersElement.location.range.end.translate(0, -1));
+        const range = new vscode.Range(insertPos, insertPos);
 
         insertParamDefn = new vscode.TextEdit(range, insert);
     } else {
         let parameters : any = {};
         parameters[property.name] = newParameterDefn;
-        const parametersSection = JSON.stringify({ parameters: parameters }, null, 2) + ',\n';  // TODO: line ending?
-        // insert this at the top of the document, with suitable commas
+        const exampleElement = jsonSymbols.find((s) => !s.containerName);
+        const rawParametersSection = `"parameters": ${JSON.stringify(parameters, null, 2)}`; //JSON.stringify({ parameters: parameters }, null, 2) + ',\n';  // TODO: line ending?
+        const indentAmount = exampleElement ? exampleElement.location.range.start.character : 2;
+        const parametersSection = indentLines(rawParametersSection, indentAmount) + (exampleElement ? ',\n' : '\n');
         const start = new vscode.Position(1, 0),
             end = new vscode.Position(1, 0),
             range = new vscode.Range(start, end);
@@ -356,6 +357,13 @@ async function convertToParameter() {
 
     activeEditor.revealRange(insertParamDefn.range);
     activeEditor.selection = new vscode.Selection(insertParamDefn.range.start, insertParamDefn.range.end);  // TODO: this ends on the comma beforehand...
+}
+
+function indentLines(text : string, amount : number) : string {
+    const indent = ' '.repeat(amount);
+    const lines = text.split('\n');
+    const indented = lines.map((l) => indent + l);
+    return indented.join('\n');
 }
 
 async function getJsonSymbols(document : vscode.TextDocument) : Promise<vscode.SymbolInformation[]> {

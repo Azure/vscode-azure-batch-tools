@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as batch from './batch';
 import * as shell from './shell';
+import * as host from './host';
 
 export const UriScheme : string = 'ab';
 
@@ -25,7 +26,8 @@ export class AzureBatchProvider implements vscode.TreeDataProvider<AzureBatchTre
             if (isRootNode(abtn)) {
                 const listResult = await batch.listResources(shell.exec, abtn.resourceType);
                 if (shell.isCommandError(listResult)) {
-                    return [];
+                    host.writeOutput(listResult.error);
+                    return [ new ErrorNode('Error - see output window for details') ];
                 }
                 return listResult.map((r) => new ResourceNode(r.id, abtn.resourceType, r));
             } else if (isResourceNode(abtn)) {
@@ -63,11 +65,11 @@ function isResourceNode(node : AzureBatchTreeNode) : node is ResourceNode {
 export interface AzureBatchTreeNode {
     readonly kind : AbtnKind;
     readonly text : string;
-    readonly resourceType : batch.BatchResourceType;
+    readonly resourceType? : batch.BatchResourceType;
     readonly uri : vscode.Uri;
 }
 
-type AbtnKind = 'root' | 'resource';
+type AbtnKind = 'root' | 'resource' | 'error';
 
 class RootNode implements AzureBatchTreeNode {
     constructor(readonly text : string, readonly resourceType : batch.BatchResourceType) { }
@@ -79,4 +81,11 @@ class ResourceNode implements AzureBatchTreeNode {
     constructor(readonly text : string, readonly resourceType : batch.BatchResourceType, readonly resource : any) { }
     readonly kind : AbtnKind = 'resource';
     readonly uri : vscode.Uri = vscode.Uri.parse(`${UriScheme}://${this.resourceType}/${this.resource.id}.json`)
+}
+
+class ErrorNode implements AzureBatchTreeNode {
+    constructor(readonly text : string) { }
+    readonly kind : AbtnKind = 'error';
+    readonly uri : vscode.Uri = vscode.Uri.parse(`${UriScheme}://`);
+  
 }
