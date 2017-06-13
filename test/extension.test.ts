@@ -11,6 +11,7 @@ import * as assert from 'assert';
 import * as vscode from 'vscode';
 import * as batch from '../src/batch';
 import * as duration from '../src/duration';
+import * as extension from '../src/extension';
 
 const nonJson = " \
   id : 'wonderjob' \
@@ -102,6 +103,38 @@ const poolTemplateJson = ' \
   } \
 } \
 ';
+
+function isTextEdit(obj : vscode.TextEdit | string) : obj is vscode.TextEdit {
+    return (<vscode.TextEdit>obj).range !== undefined;
+}
+
+suite('Extension Tests', () => {
+
+    test('When there is no parameters section, a new parameter is formatted correctly', async () => {
+        const document = await vscode.workspace.openTextDocument({
+            language: 'json',
+            content: jobTemplateJsonNoParams
+        });
+
+        console.log(document.getText());
+
+        const pos = new vscode.Position(6, 18);
+        const selection = new vscode.Selection(pos, pos);
+        const result = await extension.convertToParameterCore(document, selection);
+
+        if (isTextEdit(result)) {
+
+          const text = document.getText();
+          console.log(text);
+
+          assert.equal(text, "tbd");
+
+        } else {
+          assert.fail(result, undefined, result, 'tbd');
+        }
+    });
+
+});
 
 suite('Batch Utilities Tests', () => {
 

@@ -282,19 +282,36 @@ async function convertToParameter() {
         return;
     }
 
+    const convertResult = await convertToParameterCore(document, selection);
+
+    if (isTextEdit(convertResult)) {
+        activeEditor.revealRange(convertResult.range);
+        activeEditor.selection = new vscode.Selection(convertResult.range.start, convertResult.range.end);  // TODO: this ends on the comma beforehand...}
+    } else {
+        vscode.window.showErrorMessage(convertResult);
+    }
+}
+
+function isTextEdit(obj : vscode.TextEdit | string) : obj is vscode.TextEdit {
+    return (<vscode.TextEdit>obj).range !== undefined;
+}
+
+// TODO: need to export for testing - bah
+export async function convertToParameterCore(document: vscode.TextDocument, selection: vscode.Selection) : Promise<vscode.TextEdit | string> {
+
     const jsonSymbols = await getJsonSymbols(document);
     if (jsonSymbols.length === 0) {
-        return;
+        return 'Active document is not a JSON document';
     }
 
     const property = findProperty(jsonSymbols, selection.anchor);
     if (!property) {
-        return;
+        return 'Selection is not a JSON property';
     }
 
     const propertyContainerName = property.containerName;
-    if (!propertyContainerName.startsWith('job.properties')) {  // <- TODO
-        return;
+    if (!(propertyContainerName.startsWith('job.properties') || propertyContainerName.startsWith('pool.properties'))) {  // <- TODO
+        return 'Selection is not a resource property';
     }
 
     // TODO: we really want to do this only for leaf properties
@@ -303,7 +320,7 @@ async function convertToParameter() {
     const propertyText = document.getText(propertyLocation);
     const nameBitLength = propertyText.indexOf(':') + 1;
     if (nameBitLength <= 0) {
-        return;
+        return 'Cannot locate property name';
     }
     const propertyValueLocation = new vscode.Range(propertyLocation.start.translate(0, nameBitLength), propertyLocation.end);
     const propertyValue = JSON.parse(document.getText(propertyValueLocation));
@@ -314,6 +331,7 @@ async function convertToParameter() {
     const needToCreateParametersElement = !parametersElement;
 
     // TODO: investigate using a smart insert for this (https://github.com/Microsoft/vscode/issues/3210)
+    // (Currently doesn't seem to be a thing - works for completion items only...?)
     const newParameterDefn : any = {
         type: propertyType,
         defaultValue: propertyValue,
@@ -333,9 +351,7 @@ async function convertToParameter() {
         const insert = (lastExistingParameter ? ',\n' : (parametersElementOnOneLine ? '\n' : '')) + newParameterDefnText + (parametersElementOnOneLine ? ('\n' + ' '.repeat(parametersElement.location.range.start.character)) : (lastExistingParameter ? '' : '\n'));  // TODO: line ending
 
         const insertPos = (lastExistingParameter ? lastExistingParameter.location.range.end : (parametersElementOnOneLine ? parametersElement.location.range.end.translate(0, -1) : new vscode.Position(parametersElement.location.range.end.line, 0)));
-        const range = new vscode.Range(insertPos, insertPos);
-
-        insertParamDefn = new vscode.TextEdit(range, insert);
+        insertParamDefn = vscode.TextEdit.insert(insertPos, insert);
     } else {
         let parameters : any = {};
         parameters[property.name] = newParameterDefn;
@@ -344,11 +360,9 @@ async function convertToParameter() {
         const rawParametersSection = `"parameters": ${JSON.stringify(parameters, null, indentPerLevel)}`;
         const initialIndent = indentPerLevel;
         const parametersSection = indentLines(rawParametersSection, initialIndent) + (exampleElement ? ',\n' : '\n');
-        const start = new vscode.Position(1, 0),
-            end = new vscode.Position(1, 0),
-            range = new vscode.Range(start, end);
-
-        insertParamDefn = new vscode.TextEdit(range, parametersSection);
+        
+        const insertPos = new vscode.Position(1, 0);
+        insertParamDefn = vscode.TextEdit.insert(insertPos, parametersSection);
     }
 
     const replaceValueWithParamRef = new vscode.TextEdit(propertyValueLocation, ` "[parameters('${property.name}')]"`);
@@ -358,8 +372,7 @@ async function convertToParameter() {
     wsEdit.set(document.uri, [insertParamDefn, replaceValueWithParamRef]);
     await vscode.workspace.applyEdit(wsEdit);
 
-    activeEditor.revealRange(insertParamDefn.range);
-    activeEditor.selection = new vscode.Selection(insertParamDefn.range.start, insertParamDefn.range.end);  // TODO: this ends on the comma beforehand...
+    return insertParamDefn;
 }
 
 function indentLines(text : string, amount : number) : string {
