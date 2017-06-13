@@ -149,11 +149,14 @@ function removeProperties(resource : any, properties : string[]) : any {
 function transformProperties(obj : any, properties: string[], transform : (original : string | undefined) => string | undefined) : any {
     var result : any = {};
     for (const property in obj) {
-        if (obj[property] instanceof Object) {
-            result[property] = transformProperties(obj[property], properties, transform);
+        const value = obj[property];
+        if (value instanceof Array) {
+            result[property] = value.map((e : any) => transformProperties(e, properties, transform));
+        } else if (value instanceof Object) {
+            result[property] = transformProperties(value, properties, transform);
         } else {
             const needsTransform = properties.indexOf(property) >= 0;
-            const resultProperty = needsTransform ? transform(obj[property]) : obj[property];
+            const resultProperty = needsTransform ? transform(value) : value;
             if (resultProperty !== undefined && resultProperty !== null) {
                 result[property] = resultProperty;
             }
