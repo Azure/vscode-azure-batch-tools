@@ -322,15 +322,17 @@ async function convertToParameter() {
 
     let insertParamDefn : vscode.TextEdit;
 
+    // TODO: de-horribilate horrible formatting code
     if (parametersElement) {
-        const rawNewParameterDefnText = `"${property.name}": ${JSON.stringify(newParameterDefn, null, 2)}`;
         const lastExistingParameter = jsonSymbols.reverse().find((s) => s.containerName == 'parameters');  // TODO: order guarantees?
-        const indentAmount = lastExistingParameter ? lastExistingParameter.location.range.start.character : parametersElement.location.range.start.character + 2;
-        const newParameterDefnText = indentLines(rawNewParameterDefnText, indentAmount);
+        const indentPerLevel = lastExistingParameter ? lastExistingParameter.location.range.start.character - parametersElement.location.range.start.character : parametersElement.location.range.start.character;
+        const rawNewParameterDefnText = `"${property.name}": ${JSON.stringify(newParameterDefn, null, indentPerLevel)}`;
+        const initialIndent = indentPerLevel * 2;
+        const newParameterDefnText = indentLines(rawNewParameterDefnText, initialIndent);
         const parametersElementOnOneLine = parametersElement.location.range.start.line == parametersElement.location.range.end.line;
-        const insert = (lastExistingParameter ? ',\n' : (parametersElementOnOneLine ? '\n' : '')) + newParameterDefnText + (parametersElementOnOneLine ? ('\n' + ' '.repeat(parametersElement.location.range.start.character)) : (lastExistingParameter ? '' : ('\n' + ' '.repeat(parametersElement.location.range.start.character))));  // TODO: line ending
+        const insert = (lastExistingParameter ? ',\n' : (parametersElementOnOneLine ? '\n' : '')) + newParameterDefnText + (parametersElementOnOneLine ? ('\n' + ' '.repeat(parametersElement.location.range.start.character)) : (lastExistingParameter ? '' : '\n'));  // TODO: line ending
 
-        const insertPos = (lastExistingParameter ? lastExistingParameter.location.range.end : parametersElement.location.range.end.translate(0, -1));
+        const insertPos = (lastExistingParameter ? lastExistingParameter.location.range.end : (parametersElementOnOneLine ? parametersElement.location.range.end.translate(0, -1) : new vscode.Position(parametersElement.location.range.end.line, 0)));
         const range = new vscode.Range(insertPos, insertPos);
 
         insertParamDefn = new vscode.TextEdit(range, insert);
@@ -338,9 +340,10 @@ async function convertToParameter() {
         let parameters : any = {};
         parameters[property.name] = newParameterDefn;
         const exampleElement = jsonSymbols.find((s) => !s.containerName);
-        const rawParametersSection = `"parameters": ${JSON.stringify(parameters, null, 2)}`; //JSON.stringify({ parameters: parameters }, null, 2) + ',\n';  // TODO: line ending?
-        const indentAmount = exampleElement ? exampleElement.location.range.start.character : 2;
-        const parametersSection = indentLines(rawParametersSection, indentAmount) + (exampleElement ? ',\n' : '\n');
+        const indentPerLevel = exampleElement ? exampleElement.location.range.start.character : 2;
+        const rawParametersSection = `"parameters": ${JSON.stringify(parameters, null, indentPerLevel)}`;
+        const initialIndent = indentPerLevel;
+        const parametersSection = indentLines(rawParametersSection, initialIndent) + (exampleElement ? ',\n' : '\n');
         const start = new vscode.Position(1, 0),
             end = new vscode.Position(1, 0),
             range = new vscode.Range(start, end);
