@@ -60,7 +60,7 @@ async function createResourceImpl(doc : vscode.TextDocument, resourceType : batc
 
     const templateInfo = batch.parseBatchTemplate(doc.getText(), resourceType);
     if (!templateInfo) {
-        await vscode.window.showErrorMessage(`Current file is not an Azure Batch ${resourceType} template.`);  // TODO: support job JSON
+        await vscode.window.showErrorMessage(`Current file is not an Azure Batch ${resourceType} template.`);
         return;
     }
 
@@ -286,7 +286,7 @@ async function convertToParameter() {
 
     if (isTextEdit(convertResult)) {
         activeEditor.revealRange(convertResult.range);
-        activeEditor.selection = new vscode.Selection(convertResult.range.start, convertResult.range.end);  // TODO: this ends on the comma beforehand...}
+        activeEditor.selection = new vscode.Selection(convertResult.range.start, convertResult.range.end);
     } else {
         vscode.window.showErrorMessage(convertResult);
     }
@@ -296,7 +296,7 @@ function isTextEdit(obj : vscode.TextEdit | string) : obj is vscode.TextEdit {
     return (<vscode.TextEdit>obj).range !== undefined;
 }
 
-// TODO: need to export for testing - bah
+// TODO: any better way to make available for testing?
 export async function convertToParameterCore(document: vscode.TextDocument, selection: vscode.Selection) : Promise<vscode.TextEdit | string> {
 
     const jsonSymbols = await getJsonSymbols(document);
@@ -310,7 +310,7 @@ export async function convertToParameterCore(document: vscode.TextDocument, sele
     }
 
     const propertyContainerName = property.containerName;
-    if (!(propertyContainerName.startsWith('job.properties') || propertyContainerName.startsWith('pool.properties'))) {  // <- TODO
+    if (!(propertyContainerName.startsWith('job.properties') || propertyContainerName.startsWith('pool.properties'))) {
         return 'Selection is not a resource property';
     }
 
@@ -342,7 +342,7 @@ export async function convertToParameterCore(document: vscode.TextDocument, sele
 
     // TODO: de-horribilate horrible formatting code
     if (parametersElement) {
-        const lastExistingParameter = jsonSymbols.reverse().find((s) => s.containerName == 'parameters');  // TODO: order guarantees?
+        const lastExistingParameter = jsonSymbols.reverse().find((s) => s.containerName == 'parameters');  // not sure what order guarantees the symbol provider makes, but it's not critical if this isn't actually the last one
         const indentPerLevel = lastExistingParameter ? lastExistingParameter.location.range.start.character - parametersElement.location.range.start.character : parametersElement.location.range.start.character;
         const rawNewParameterDefnText = `"${property.name}": ${JSON.stringify(newParameterDefn, null, indentPerLevel)}`;
         const initialIndent = indentPerLevel * 2;
@@ -397,7 +397,6 @@ function findProperty(symbols: vscode.SymbolInformation[], position: vscode.Posi
     if (!containingSymbols || containingSymbols.length === 0) {
         return null;
     }
-    // TODO: is it always the last one in the collection?  Not sure what guarantees we have...
     const sorted = containingSymbols.sort((a, b) => (a.containerName || '').length - (b.containerName || '').length);
     return sorted[sorted.length - 1];
 }
