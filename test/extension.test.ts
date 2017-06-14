@@ -12,6 +12,8 @@ import * as vscode from 'vscode';
 import * as batch from '../src/batch';
 import * as duration from '../src/duration';
 import * as extension from '../src/extension';
+import * as path from 'path';
+import * as fs from 'fs';
 
 const nonJson = " \
   id : 'wonderjob' \
@@ -108,17 +110,25 @@ function isTextEdit(obj : vscode.TextEdit | string) : obj is vscode.TextEdit {
     return (<vscode.TextEdit>obj).range !== undefined;
 }
 
+async function waitForSymbols(document : vscode.TextDocument) : Promise<vscode.SymbolInformation[]> {
+    for (let i = 0; i < 100000; ++i) {
+        const sis : any = await vscode.commands.executeCommand('vscode.executeDocumentSymbolProvider', document.uri);
+        if (sis && sis.length > 0) {
+            return sis;
+        }
+    }
+    throw "symbols not ready after waiting";
+}
+
 suite('Extension Tests', () => {
 
     test('When there is no parameters section, a new parameter is formatted correctly', async () => {
-        const document = await vscode.workspace.openTextDocument({
-            language: 'json',
-            content: jobTemplateJsonNoParams
-        });
+        const document = await vscode.workspace.openTextDocument(path.join(__dirname, '../../test/jobtemplate_noparams.json'));
+        const expected = fs.readFileSync(path.join(__dirname, '../../test/jobtemplate_noparams.after_poolid.json'), 'utf8');
 
-        console.log(document.getText());
+        await waitForSymbols(document);
 
-        const pos = new vscode.Position(6, 18);
+        const pos = new vscode.Position(7, 18);  // poolId
         const selection = new vscode.Selection(pos, pos);
         const result = await extension.convertToParameterCore(document, selection);
 
@@ -127,7 +137,7 @@ suite('Extension Tests', () => {
           const text = document.getText();
           console.log(text);
 
-          assert.equal(text, "tbd");
+          assert.equal(text, expected);
 
         } else {
           assert.fail(result, undefined, result, 'tbd');
