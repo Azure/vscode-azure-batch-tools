@@ -39,7 +39,8 @@
             "\t} ],",
             "\t\"repeatTask\": {",
             "\t\t\"commandLine\": \"${3:commandLine}\",",
-            "\t\t\"resourceFiles\": [],",
+            "\t\t\"resourceFiles\": [",
+            "\t\t],",
             "\t\t\"outputFiles\": []",
             "\t}",
             "}"
@@ -50,7 +51,8 @@
         "prefix": "batch.taskcollection",
         "body": [
             "\"taskFactory\": {",
-            "\t\"tasks\": []",
+            "\t\"tasks\": [",
+            "\t]",
             "\t}",
             "}"
         ],
