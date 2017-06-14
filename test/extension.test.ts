@@ -120,28 +120,55 @@ async function waitForSymbols(document : vscode.TextDocument) : Promise<vscode.S
     throw "symbols not ready after waiting";
 }
 
+async function assertParameterConversionResult(sourceFile : string, expectedResultFile : string, cursorPosition : vscode.Position) {
+    const document = await vscode.workspace.openTextDocument(path.join(__dirname, '../../test/' + sourceFile));
+    const expected = fs.readFileSync(path.join(__dirname, '../../test/' + expectedResultFile), 'utf8');
+
+    await waitForSymbols(document);
+
+    const selection = new vscode.Selection(cursorPosition, cursorPosition);
+    const result = await extension.convertToParameterCore(document, selection);
+
+    if (isTextEdit(result)) {
+        const text = document.getText();
+        assert.equal(text, expected);
+    } else {
+        assert.fail(result, undefined, result, 'tbd');
+    }
+}
+
 suite('Extension Tests', () => {
 
     test('When there is no parameters section, a new parameter is formatted correctly', async () => {
-        const document = await vscode.workspace.openTextDocument(path.join(__dirname, '../../test/jobtemplate_noparams.json'));
-        const expected = fs.readFileSync(path.join(__dirname, '../../test/jobtemplate_noparams.after_poolid.json'), 'utf8');
+        await assertParameterConversionResult(
+            'jobtemplate_noparams.json',
+            'jobtemplate_noparams.after_poolid.json',
+            new vscode.Position(7, 18)  // poolId
+        );
+    });
 
-        await waitForSymbols(document);
+    test('When there is an empty parameters section, a new parameter is formatted correctly', async () => {
+        await assertParameterConversionResult(
+            'jobtemplate_emptyparams.json',
+            'jobtemplate_emptyparams.after_poolid.json',
+            new vscode.Position(9, 18)  // poolId
+        );
+    });
 
-        const pos = new vscode.Position(7, 18);  // poolId
-        const selection = new vscode.Selection(pos, pos);
-        const result = await extension.convertToParameterCore(document, selection);
+    test('When there is an empty parameters section and it is all on one line, a new parameter is formatted correctly', async () => {
+        await assertParameterConversionResult(
+            'jobtemplate_emptyparamsoneline.json',
+            'jobtemplate_emptyparamsoneline.after_poolid.json',
+            new vscode.Position(8, 18)  // poolId
+        );
+    });
 
-        if (isTextEdit(result)) {
-
-          const text = document.getText();
-          console.log(text);
-
-          assert.equal(text, expected);
-
-        } else {
-          assert.fail(result, undefined, result, 'tbd');
-        }
+    test('When there are existing parameters, a new parameter is formatted correctly', async () => {
+        await assertParameterConversionResult(
+            'jobtemplate_oneparam.json',
+            'jobtemplate_oneparam.after_poolid.json',
+            new vscode.Position(15, 18)  // poolId
+        );
     });
 
 });
