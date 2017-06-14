@@ -169,7 +169,7 @@ function transformProperties(obj : any, properties: string[], transform : (origi
 function durationProperties(resourceType : BatchResourceType) : string[] {
     switch (resourceType) {
         case 'job':
-            return [ 'maxWallClockTime' ];
+            return [ 'maxWallClockTime', 'retentionTime' ];
         case 'pool':
             return [ 'resizeTimeout' ];
         default:
