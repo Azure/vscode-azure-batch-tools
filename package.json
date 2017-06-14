@@ -72,6 +72,10 @@
       {
         "language": "json",
         "path": "./snippet/job.json"
+      },
+      {
+        "language": "json",
+        "path": "./snippet/template.json"
       }
     ],
     "views": {
