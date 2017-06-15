@@ -25,7 +25,8 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('azure.batch.getAsTemplate', viewnodeGetAsTemplate),
         vscode.commands.registerCommand('azure.batch.refresh', () => azureBatchProvider.refresh()),
         vscode.window.registerTreeDataProvider('azure.batch.explorer', azureBatchProvider),
-        vscode.workspace.registerTextDocumentContentProvider(azurebatchtree.UriScheme, azureBatchProvider)
+        vscode.workspace.registerTextDocumentContentProvider(azurebatchtree.UriScheme, azureBatchProvider),
+        vscode.languages.registerCompletionItemProvider('json', new ParameterReferenceCompletionItemProvider(), '!')
     ];
 
     disposables.forEach((d) => context.subscriptions.push(d), this);
@@ -435,4 +436,26 @@ interface IParameterFileInfo {
     readonly exists : boolean;
     readonly path : string;
     readonly document? : vscode.TextDocument;
+}
+
+class ParameterReferenceCompletionItemProvider implements vscode.CompletionItemProvider {
+    provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken) : vscode.ProviderResult<vscode.CompletionItem[]> {
+        return provideCompletionItemsCore(document, position, token);  // Helper method allows us to use async/await
+    }
+}
+
+async function provideCompletionItemsCore(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken) : Promise<vscode.CompletionItem[]> {
+    const sis : vscode.SymbolInformation[] = await getJsonSymbols(document);  // We use this rather than JSON.parse because the document is likely to be invalid JSON at the time the user is in the middle of typing the completion trigger
+    if (sis) {
+        return sis.filter((si) => si.containerName == 'parameters')
+                  .map((si) => completionItemFor(si));
+    }
+    return [];
+}
+
+function completionItemFor(si : vscode.SymbolInformation) : vscode.CompletionItem {
+    let ci = new vscode.CompletionItem(`"batch.parameter('${si.name}')"`);
+    ci.insertText = `"[parameter('${si.name}')]"`;
+    ci.detail = `Reference to the '${si.name}' template parameter`;
+    return ci;
 }

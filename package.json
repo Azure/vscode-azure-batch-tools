@@ -25,7 +25,8 @@
     "onCommand:azure.batch.createTemplateFromJob",
     "onCommand:azure.batch.createTemplateFromPool",
     "onCommand:azure.batch.convertToParameter",
-    "onView:azure.batch.explorer"
+    "onView:azure.batch.explorer",
+    "onLanguage:json"
   ],
   "main": "./out/src/extension",
   "contributes": {
