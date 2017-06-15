@@ -11,9 +11,25 @@ import * as shell from './shell';
 import * as azurebatchtree from './azurebatchtree';
 import * as host from './host';
 
+let diagnostics : vscode.DiagnosticCollection;
+
 export function activate(context: vscode.ExtensionContext) {
 
     const azureBatchProvider = new azurebatchtree.AzureBatchProvider();
+    diagnostics = vscode.languages.createDiagnosticCollection('json');
+
+    // TODO: This seems very unwieldy, and our method relies on symbols
+    // which are only loaded asynchronously so the initial document doesn't
+    // get checked until it changes.
+    vscode.workspace.onDidOpenTextDocument(diagnoseTemplateProblems, undefined, context.subscriptions);
+    vscode.workspace.onDidCloseTextDocument((textDocument) => {
+        diagnostics.delete(textDocument.uri);
+    }, null, context.subscriptions);
+    vscode.workspace.onDidChangeTextDocument((ch) => {
+        diagnoseTemplateProblems(ch.document);
+    }, null, context.subscriptions);
+    vscode.workspace.onDidSaveTextDocument(diagnoseTemplateProblems, undefined, context.subscriptions);
+    vscode.workspace.textDocuments.forEach(diagnoseTemplateProblems, undefined);
 
     let disposables = [
         vscode.commands.registerCommand('azure.batch.createJob', createJob),
@@ -26,7 +42,8 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('azure.batch.refresh', () => azureBatchProvider.refresh()),
         vscode.window.registerTreeDataProvider('azure.batch.explorer', azureBatchProvider),
         vscode.workspace.registerTextDocumentContentProvider(azurebatchtree.UriScheme, azureBatchProvider),
-        vscode.languages.registerCompletionItemProvider('json', new ParameterReferenceCompletionItemProvider())
+        vscode.languages.registerCompletionItemProvider('json', new ParameterReferenceCompletionItemProvider()),
+        diagnostics
     ];
 
     disposables.forEach((d) => context.subscriptions.push(d), this);
@@ -459,4 +476,50 @@ function completionItemFor(si : vscode.SymbolInformation) : vscode.CompletionIte
     ci.documentation = `A reference to the '${si.name}' template parameter`;
     ci.detail = `vscode-azure-batch-tools`;
     return ci;
+}
+
+interface IParameterRefMatch {
+    readonly index : number;
+    readonly name : string;
+}
+
+function parameterRefs(text : string) : IParameterRefMatch[] {
+    let refs : IParameterRefMatch[] = [];
+    let parameterRegex = /\"\[parameters\('(\w+)'\)\]"/g;
+    let match : any;
+    while ((match = parameterRegex.exec(text)) !== null) {
+        let index : number = match.index + "\"[parameters('".length;
+        let name : string = match[1];
+        refs.push({ index: index, name : name });
+    }
+    return refs;
+}
+
+async function diagnoseTemplateProblems(document : vscode.TextDocument) : Promise<void> {
+    if (document.languageId != 'json') {
+        return;
+    }
+
+    let ds : vscode.Diagnostic[] = [];
+
+    const sis : vscode.SymbolInformation[] = await getJsonSymbols(document);
+    if (sis && sis.length > 0 /* don't report warnings just because the symbols haven't loaded yet */) {
+        const paramNames = sis.filter((si) => si.containerName == 'parameters')
+                              .map((si) => si.name);
+        const paramRefs = parameterRefs(document.getText());
+        if (paramRefs) {
+            for (const paramRef of paramRefs) {
+                if (paramNames.indexOf(paramRef.name) < 0) {
+                    const startPos = document.positionAt(paramRef.index);
+                    const endPos = document.positionAt(paramRef.index + paramRef.name.length);
+                    // TODO: perhaps a CodeActionProvider would be better because then
+                    // we could offer to create the parameter?
+                    const d = new vscode.Diagnostic(new vscode.Range(startPos, endPos), `Unknown parameter name ${paramRef.name}`, vscode.DiagnosticSeverity.Warning);
+                    ds.push(d);
+                }
+            }
+        }
+    }
+
+    diagnostics.set(document.uri, ds);
 }
