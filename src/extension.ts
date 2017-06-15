@@ -26,7 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('azure.batch.refresh', () => azureBatchProvider.refresh()),
         vscode.window.registerTreeDataProvider('azure.batch.explorer', azureBatchProvider),
         vscode.workspace.registerTextDocumentContentProvider(azurebatchtree.UriScheme, azureBatchProvider),
-        vscode.languages.registerCompletionItemProvider('json', new ParameterReferenceCompletionItemProvider(), '!')
+        vscode.languages.registerCompletionItemProvider('json', new ParameterReferenceCompletionItemProvider())
     ];
 
     disposables.forEach((d) => context.subscriptions.push(d), this);
@@ -454,7 +454,7 @@ async function provideCompletionItemsCore(document: vscode.TextDocument, positio
 }
 
 function completionItemFor(si : vscode.SymbolInformation) : vscode.CompletionItem {
-    let ci = new vscode.CompletionItem(`"batch.parameter('${si.name}')"`);
+    let ci = new vscode.CompletionItem(`batch.parameter('${si.name}')`);
     ci.insertText = `"[parameter('${si.name}')]"`;
     ci.detail = `Reference to the '${si.name}' template parameter`;
     return ci;
