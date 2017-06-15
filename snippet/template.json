@@ -17,7 +17,7 @@
         "description": "An Azure Batch resource template"
     },
     "Azure Batch Template Parameter": {
-        "prefix": "batch.parameter",
+        "prefix": "batch.parameter-declaration",
         "body": [
             "\"${1:name}\": {",
             "\t\"type\": \"${2:string}\",",
@@ -26,6 +26,6 @@
             "\t}",
             "}"
         ],
-        "description": "A parameter for an Azure Batch template"
+        "description": "Declares a parameter for an Azure Batch template"
     }
 }

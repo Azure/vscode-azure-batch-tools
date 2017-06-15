@@ -1,6 +1,6 @@
 {
     "Azure Batch Application Template": {
-        "prefix": "batch.apptemplate",
+        "prefix": "batch.app-template",
         "body": [
             "{",
             "\t\"parameters\": {",
@@ -11,7 +11,7 @@
         "description": "An application template for Azure Batch jobs"
     },
     "Azure Batch Task Per File Task Factory": {
-        "prefix": "batch.taskperfile",
+        "prefix": "batch.task-per-file",
         "body": [
             "\"taskFactory\": {",
             "\t\"type\": \"taskPerFile\",",
@@ -28,7 +28,7 @@
         "description": "A task-per-file task factory for Azure Batch jobs"
     },
     "Azure Batch Parametric Sweep Task Factory": {
-        "prefix": "batch.parametricsweep",
+        "prefix": "batch.parametric-sweep",
         "body": [
             "\"taskFactory\": {",
             "\t\"type\": \"parametricSweep\",",
@@ -48,7 +48,7 @@
         "description": "A parametric sweep task factory for Azure Batch jobs"
     },
     "Azure Batch Task Collection Task Factory": {
-        "prefix": "batch.taskcollection",
+        "prefix": "batch.task-collection",
         "body": [
             "\"taskFactory\": {",
             "\t\"tasks\": [",

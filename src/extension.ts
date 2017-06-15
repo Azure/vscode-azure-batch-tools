@@ -454,8 +454,9 @@ async function provideCompletionItemsCore(document: vscode.TextDocument, positio
 }
 
 function completionItemFor(si : vscode.SymbolInformation) : vscode.CompletionItem {
-    let ci = new vscode.CompletionItem(`batch.parameter('${si.name}')`);
+    let ci = new vscode.CompletionItem(`batch.parameter-ref('${si.name}')`);
     ci.insertText = `"[parameter('${si.name}')]"`;
-    ci.detail = `Reference to the '${si.name}' template parameter`;
+    ci.documentation = `A reference to the '${si.name}' template parameter`;
+    ci.detail = `vscode-azure-batch-tools`;
     return ci;
 }
