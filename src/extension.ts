@@ -356,32 +356,9 @@ export async function convertToParameterCore(document: vscode.TextDocument, sele
         metadata: { description: `Value for ${property.containerName}.${property.name}` }
     }
 
-    let insertParamDefn : vscode.TextEdit;
+    const model = createParameterConversionModel(jsonSymbols, property.name, newParameterDefn);
 
-    // TODO: de-horribilate horrible formatting code
-    if (parametersElement) {
-        const lastExistingParameter = jsonSymbols.reverse().find((s) => s.containerName == 'parameters');  // not sure what order guarantees the symbol provider makes, but it's not critical if this isn't actually the last one
-        const indentPerLevel = lastExistingParameter ? lastExistingParameter.location.range.start.character - parametersElement.location.range.start.character : parametersElement.location.range.start.character;
-        const rawNewParameterDefnText = `"${property.name}": ${JSON.stringify(newParameterDefn, null, indentPerLevel)}`;
-        const initialIndent = indentPerLevel * 2;
-        const newParameterDefnText = indentLines(rawNewParameterDefnText, initialIndent);
-        const parametersElementOnOneLine = parametersElement.location.range.start.line == parametersElement.location.range.end.line;
-        const insert = (lastExistingParameter ? ',\n' : (parametersElementOnOneLine ? '\n' : '')) + newParameterDefnText + (parametersElementOnOneLine ? ('\n' + ' '.repeat(parametersElement.location.range.start.character)) : (lastExistingParameter ? '' : '\n'));  // TODO: line ending
-
-        const insertPos = (lastExistingParameter ? lastExistingParameter.location.range.end : (parametersElementOnOneLine ? parametersElement.location.range.end.translate(0, -1) : new vscode.Position(parametersElement.location.range.end.line, 0)));
-        insertParamDefn = vscode.TextEdit.insert(insertPos, insert);
-    } else {
-        let parameters : any = {};
-        parameters[property.name] = newParameterDefn;
-        const exampleElement = jsonSymbols.find((s) => !s.containerName);
-        const indentPerLevel = exampleElement ? exampleElement.location.range.start.character : 2;
-        const rawParametersSection = `"parameters": ${JSON.stringify(parameters, null, indentPerLevel)}`;
-        const initialIndent = indentPerLevel;
-        const parametersSection = indentLines(rawParametersSection, initialIndent) + (exampleElement ? ',\n' : '\n');
-        
-        const insertPos = new vscode.Position(1, 0);
-        insertParamDefn = vscode.TextEdit.insert(insertPos, parametersSection);
-    }
+    const insertParamDefn : vscode.TextEdit = model.getEdit();
 
     const replaceValueWithParamRef = new vscode.TextEdit(propertyValueLocation, ` "[parameters('${property.name}')]"`);
 
@@ -393,11 +370,119 @@ export async function convertToParameterCore(document: vscode.TextDocument, sele
     return insertParamDefn;
 }
 
+interface IParameterConversionModel {
+    getEdit() : vscode.TextEdit;
+}
+
+function indentOf(symbol : vscode.SymbolInformation) {
+    return symbol.location.range.start.character;
+}
+
+function indentFrom(symbol1 : vscode.SymbolInformation, symbol2 : vscode.SymbolInformation) {
+    const offset = indentOf(symbol1) - indentOf(symbol2);
+    return Math.abs(offset);
+}
+
 function indentLines(text : string, amount : number) : string {
     const indent = ' '.repeat(amount);
     const lines = text.split('\n');
     const indented = lines.map((l) => indent + l);
     return indented.join('\n');
+}
+
+function isSingleLine(range: vscode.Range) {
+    return range.start.line == range.end.line;
+}
+
+function lineStart(pos: vscode.Position) {
+    return new vscode.Position(pos.line, 0);
+}
+
+function immediatelyBefore(pos: vscode.Position) {
+    return pos.translate(0, -1);
+}
+
+function createParameterConversionModel(jsonSymbols : vscode.SymbolInformation[], propertyName : string, newParameterDefn : any) : IParameterConversionModel {
+    const parametersElement = jsonSymbols.find((s) => s.name == 'parameters' && !s.containerName);
+    const parameterSymbols = jsonSymbols.filter((s) => s.containerName == 'parameters');
+    const lastExistingParameter = parameterSymbols.length > 0 ? parameterSymbols.reverse()[0] : undefined;  // not sure what order guarantees the symbol provider makes, but it's not critical if this isn't actually the last one
+
+    class InsertAfterExistingParameter implements IParameterConversionModel {
+        constructor(private readonly parametersElement : vscode.SymbolInformation, private readonly existingParameter : vscode.SymbolInformation) {
+        }
+        getEdit() : vscode.TextEdit {
+            const indentPerLevel = indentFrom(this.existingParameter, this.parametersElement);
+            const initialIndent = indentPerLevel * 2;
+            const rawNewParameterDefnText = `"${propertyName}": ${JSON.stringify(newParameterDefn, null, indentPerLevel)}`;
+            const newParameterDefnText = indentLines(rawNewParameterDefnText, initialIndent);
+            const insertText = ',\n' + newParameterDefnText;
+
+            const insertPos = this.existingParameter.location.range.end;
+            const edit = vscode.TextEdit.insert(insertPos, insertText);
+
+            return edit;
+        }
+    }
+
+    class InsertIntoEmptyParametersSection implements IParameterConversionModel {
+        constructor(private readonly parametersElement : vscode.SymbolInformation) {
+        }
+        getEdit() : vscode.TextEdit {
+            const indentPerLevel = this.parametersElement.location.range.start.character;
+            const initialIndent = indentPerLevel * 2;
+
+            const rawNewParameterDefnText = `"${propertyName}": ${JSON.stringify(newParameterDefn, null, indentPerLevel)}`;
+            const newParameterDefnText = indentLines(rawNewParameterDefnText, initialIndent);
+            const parametersElementOnOneLine = isSingleLine(this.parametersElement.location.range);  // for the "parameters": {} case
+
+            // prefix and suffix are for fixing up cases where the parameters element is squashed on one line
+            const prefix = (parametersElementOnOneLine ? '\n' : '');
+            const suffix = (parametersElementOnOneLine ? (' '.repeat(indentPerLevel)) : '');
+            const insertText = prefix + newParameterDefnText + '\n' + suffix;  // TODO: line ending
+
+            // if the parameters element is squashed then our insert position is to the left of the closing brace (which will push things into the right place)
+            // otherwise we want to insert at the start of the line containing the closing brace
+            const closingBracePos = this.parametersElement.location.range.end;
+            const insertPos = (parametersElementOnOneLine ? immediatelyBefore(closingBracePos) : lineStart(closingBracePos));
+            const edit = vscode.TextEdit.insert(insertPos, insertText);
+
+            return edit;
+        }
+    }
+
+    class InsertNewParametersSection implements IParameterConversionModel {
+        getEdit() : vscode.TextEdit {
+            let parameters : any = {};
+            parameters[propertyName] = newParameterDefn;
+
+            const topLevelElement = jsonSymbols.find((s) => !s.containerName);
+            const indentPerLevel = topLevelElement ? indentOf(topLevelElement) : 2;
+            const rawParametersSection = `"parameters": ${JSON.stringify(parameters, null, indentPerLevel)}`;
+
+            const parametersSectionText = indentLines(rawParametersSection, indentPerLevel);  // going in at top level so indent only once
+            const topLevelElementSeparator = topLevelElement ? ',\n' : '\n';
+            const insertText = parametersSectionText + topLevelElementSeparator;
+            
+            const insertPos = new vscode.Position(1, 0);
+            const edit = vscode.TextEdit.insert(insertPos, insertText);
+            
+            return edit;
+        }
+
+    }
+
+    if (parametersElement) {
+        if (lastExistingParameter) {
+            // We are appending after an existing parameter
+            return new InsertAfterExistingParameter(parametersElement, lastExistingParameter);
+        } else {
+            // We are inserting into an empty parameters section
+            return new InsertIntoEmptyParametersSection(parametersElement);
+        }
+    } else {
+        // There is no parameters section - we need to create one and insert it at the top of the document
+        return new InsertNewParametersSection();
+    }
 }
 
 async function getJsonSymbols(document : vscode.TextDocument) : Promise<vscode.SymbolInformation[]> {
