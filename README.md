@@ -6,11 +6,31 @@ A [Visual Studio Code](https://code.visualstudio.com/) extension for working wit
 
 This is early-stage work in progress.  The happy paths should work okay, but the error paths haven't really been tested, and are likely to produce mediocre error messages at best!  And it hasn't yet been tested at all on Mac or Linux.  Please do raise issues for anything which is missing (plenty of that!), broken or unpolished.
 
+## Running the Extension
+
+This isn't yet published in the VS Code marketplace.  To run it yourself:
+
+* Clone the git repo.
+* Run `npm install` in the working copy root.
+* Open the folder in VS Code (`code .`).
+* Hit F5 to run the extension in the Extension Development Host.
+
+The extension uses VS Code 1.13 features so you will need that version or above.
+
 # Prerequisites
 
 This extension depends on the [Azure CLI 2.0](https://docs.microsoft.com/en-us/cli/azure/overview) and the [Azure Batch CLI extensions](https://github.com/Azure/azure-batch-cli-extensions).  Before running this VS Code extension, you must install both of these, *and* must log in to Azure (`az login`) and to a Batch account (`az batch account login`).  (At the moment, the VS Code extension doesn't provide any interactive support for installation or login, though you can run the login commands through the VS Code Terminal window.  If you install the CLI but not the Batch extensions, you may get weird errors!)
 
-The extension includes a custom explorer pane and therefore requires VS Code 1.13 or above.
+**Important:** The 'convenient' ways of installing Azure CLI 2.0 (e.g. the Windows MSI) _will not allow you to install the Batch Extensions_.  You need the `az component update` command to install the extensions.  You _should_ be able to use `pip install azure-cli` to install the CLI with component update support (if it doesn't work, please let the Azure CLI folks know).
+
+# Features
+
+* Commands for working with Azure Batch job templates and pool templates (see below)
+* Snippets and auto-completion for common template elements and parameters
+  * Type `batch` in a JSON file to see available snippets
+* Template diagnostics
+  * Warning squiggles when a template references an undeclared parameter (current status: wonky)
+* Custom explorer pane displaying Azure Batch jobs and pools
 
 # Commands
 
