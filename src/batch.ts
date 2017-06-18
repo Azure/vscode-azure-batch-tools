@@ -2,9 +2,7 @@ import { IShellExecResult, ICommandError } from './shell';
 import * as duration from './duration';
 
 export function parseBatchTemplate(text : string, resourceType : BatchResourceType) : IBatchResource | null {
-    
     try {
-
         const jobject : any = JSON.parse(text);
         if (!jobject) {
             return null;
@@ -15,7 +13,6 @@ export function parseBatchTemplate(text : string, resourceType : BatchResourceTy
         }
 
         return { isTemplate: false, parameters: [] };
-
     } catch (SyntaxError) {
         return null;
     }
@@ -47,7 +44,6 @@ function plural(resourceType : BatchResourceType) : string {
 }
 
 function parseTemplateCore(json : any) : IBatchResource {
-    
     const parameters : IBatchTemplateParameter[] = [];
 
     for (const p in json.parameters || []) {
@@ -62,7 +58,6 @@ function parseTemplateCore(json : any) : IBatchResource {
     }
 
     return { isTemplate: true, parameters: parameters };
-
 }
 
 export function parseParameters(text : string) : IParameterValue[] {
@@ -81,7 +76,6 @@ export function parseParameters(text : string) : IParameterValue[] {
 }
 
 function parseParametersCore(json : any) : IParameterValue[] {
-    
     const parameters : IParameterValue[] = [];
 
     for (const key in json) {
@@ -118,7 +112,6 @@ export async function getResource(shellExec : (command : string) => Promise<IShe
 }
 
 export function makeTemplate(resource : any, resourceType : BatchResourceType) : any {
-
     const filtered = removeProperties(resource, unsettableProperties(resourceType));
     // TODO: strip defaults (particularly nulls or empty objects) - we get null-stripping as a side-effect of transformProperties but shouldn't rely on this!
     const templateBody = filtered;

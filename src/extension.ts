@@ -15,7 +15,6 @@ import * as textmodels from './textmodels';
 let diagnostics : vscode.DiagnosticCollection;
 
 export function activate(context: vscode.ExtensionContext) {
-
     const azureBatchProvider = new azurebatchtree.AzureBatchProvider();
     diagnostics = vscode.languages.createDiagnosticCollection('json');
 
@@ -125,7 +124,6 @@ async function createResourceImpl(doc : vscode.TextDocument, resourceType : batc
 
         host.writeOutput("Done");
     });
-
 }
 
 async function getParameterFile(templateFileName : string, resourceType : batch.BatchResourceType) : Promise<IParameterFileInfo> {
@@ -229,7 +227,6 @@ async function createTemplateFromPool() {
 }
 
 async function createTemplateFromResource(resourceType : batch.BatchResourceType, resourceTypePlural : string) {
-
     host.writeOutput(`Getting list of ${resourceTypePlural} from account...`);
 
     const resources = await batch.listResources(shell.exec, resourceType);
@@ -257,7 +254,6 @@ async function createTemplateFile(resourceType : batch.BatchResourceType, resour
     const template = batch.makeTemplate(resource, resourceType);
     const filename = id + `.${resourceType}template.json`;
     createFile(filename, JSON.stringify(template, null, 2));
-   
 }
 
 async function createFile(filename : string, content : string) : Promise<void> {
@@ -285,7 +281,6 @@ function quickPickForResource(resource: batch.IBatchResourceContent) : AllowedVa
 }
 
 async function convertToParameter() {
-
     const activeEditor = vscode.window.activeTextEditor;
     if (!activeEditor) {
         return;
@@ -317,7 +312,6 @@ function isTextEdit(obj : vscode.TextEdit | string) : obj is vscode.TextEdit {
 
 // TODO: any better way to make available for testing?
 export async function convertToParameterCore(document: vscode.TextDocument, selection: vscode.Selection) : Promise<vscode.TextEdit | string> {
-
     const jsonSymbols = await getJsonSymbols(document);
     if (jsonSymbols.length === 0) {
         return 'Active document is not a JSON document';

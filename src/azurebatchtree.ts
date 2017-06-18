@@ -50,8 +50,8 @@ export class AzureBatchProvider implements vscode.TreeDataProvider<AzureBatchTre
         return JSON.stringify(getResult, null, 2);
     }
     refresh(): void {
-		this._onDidChangeTreeData.fire();
-	}
+        this._onDidChangeTreeData.fire();
+    }
 }
 
 function isRootNode(node : AzureBatchTreeNode) : node is RootNode {
@@ -87,5 +87,4 @@ class ErrorNode implements AzureBatchTreeNode {
     constructor(readonly text : string) { }
     readonly kind : AbtnKind = 'error';
     readonly uri : vscode.Uri = vscode.Uri.parse(`${UriScheme}://`);
-  
 }
