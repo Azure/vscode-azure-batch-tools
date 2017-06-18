@@ -15,7 +15,7 @@ This isn't yet published in the VS Code marketplace.  To run it yourself:
 * Open the folder in VS Code (`code .`).
 * Hit F5 to run the extension in the Extension Development Host.
 
-The extension uses VS Code 1.13 features so you will need that version or above.
+The extension uses VS Code 1.13 (May 2017) features so you will need that version or above.
 
 # Prerequisites
 

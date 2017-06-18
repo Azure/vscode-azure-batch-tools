@@ -8,8 +8,11 @@ export const UriScheme : string = 'ab';
 export class AzureBatchProvider implements vscode.TreeDataProvider<AzureBatchTreeNode>, vscode.TextDocumentContentProvider {
 	private _onDidChangeTreeData: vscode.EventEmitter<AzureBatchTreeNode | undefined> = new vscode.EventEmitter<AzureBatchTreeNode | undefined>();
 	readonly onDidChangeTreeData: vscode.Event<AzureBatchTreeNode | undefined> = this._onDidChangeTreeData.event;
+
     getTreeItem(abtn : AzureBatchTreeNode) : vscode.TreeItem {
-        const collapsibleState = abtn.kind === 'root' ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None;
+        const collapsibleState = abtn.kind === 'root'
+            ? vscode.TreeItemCollapsibleState.Collapsed
+            : vscode.TreeItemCollapsibleState.None;
         let item = new vscode.TreeItem(abtn.text, collapsibleState);
         item.contextValue = 'azure.batch.' + abtn.kind;
         if (isResourceNode(abtn)) {
@@ -21,6 +24,7 @@ export class AzureBatchProvider implements vscode.TreeDataProvider<AzureBatchTre
         }
         return item;
     }
+
     async getChildren(abtn? : AzureBatchTreeNode) : Promise<AzureBatchTreeNode[]> {
         if (abtn) {
             if (isRootNode(abtn)) {
@@ -37,11 +41,13 @@ export class AzureBatchProvider implements vscode.TreeDataProvider<AzureBatchTre
         }
         return [new RootNode("Jobs", 'job'), new RootNode("Pools", 'pool')];
     }
+
     provideTextDocumentContent(uri: vscode.Uri, token : vscode.CancellationToken) : vscode.ProviderResult<string> {
         const resourceType = <batch.BatchResourceType> uri.authority;
-        const id : string = uri.path.substring(0, uri.path.length - '.json'.length).substr(1);
+        const id : string = uri.path.substring(1, uri.path.length - '.json'.length);
         return this.getBatchResourceJson(resourceType, id);
     }
+
     private async getBatchResourceJson(resourceType : batch.BatchResourceType, id : string) : Promise<string> {
         const getResult = await batch.getResource(shell.exec, resourceType, id);
         if (shell.isCommandError(getResult)) {
@@ -49,6 +55,7 @@ export class AzureBatchProvider implements vscode.TreeDataProvider<AzureBatchTre
         }
         return JSON.stringify(getResult, null, 2);
     }
+
     refresh(): void {
         this._onDidChangeTreeData.fire();
     }
