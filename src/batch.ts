@@ -114,7 +114,7 @@ export async function getResource(shellExec : (command : string) => Promise<IShe
 }
 
 export function makeTemplate(resource : any, resourceType : BatchResourceType) : any {
-    const filtered = removeProperties(resource, unsettableProperties(resourceType));
+    const filtered = withoutProperties(resource, unsettableProperties(resourceType));
     // TODO: strip defaults (particularly nulls or empty objects) - we get null-stripping as a side-effect of transformProperties but shouldn't rely on this!
     const templateBody = filtered;
 
@@ -131,7 +131,7 @@ export function makeTemplate(resource : any, resourceType : BatchResourceType) :
     return template;
 }
 
-function removeProperties(resource : any, properties : string[]) : any {
+function withoutProperties(resource : any, properties : string[]) : any {
     var result : any = {};
     for (const property in resource) {
         if (properties.indexOf(property) < 0) {
