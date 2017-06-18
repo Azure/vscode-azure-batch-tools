@@ -1,5 +1,6 @@
 import { IShellExecResult, ICommandError } from './shell';
 import * as duration from './duration';
+import * as host from './host';
 
 export function parseBatchTemplate(text : string, resourceType : BatchResourceType) : IBatchResource | null {
     try {
@@ -71,6 +72,7 @@ export function parseParameters(text : string) : IParameterValue[] {
         return parseParametersCore(jobject);
 
     } catch (SyntaxError) {
+        host.writeOutput("Can't use candidate parameter file at it's not valid JSON - prompting for parameters instead");
         return [];
     }
 }
