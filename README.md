@@ -36,7 +36,7 @@ This extension depends on the [Azure CLI 2.0](https://docs.microsoft.com/en-us/c
 
 All commands are in the 'Azure' category.
 
-* **Azure: Create Batch Job:** Creates an Azure Batch job from the job template or job JSON in the active tab.  If the active tab is a template, the command prompts for a value for each template parameter.  If there is a parameters file in the same directory (named the same as the job template, but with the extension `.parameters.json`), then it will use any values in this file (but will prompt for any values not given in the file).
+* **Azure: Create Batch Job:** Creates an Azure Batch job from the job template or job JSON in the active tab.  If the active tab is a template, the command prompts for a value for each template parameter.  If there is a parameters file in the same directory (named the same as the job template, but with the extension `.parameters.json`), then it will use any values in this file (but will prompt for any values not given in the file).  Refer to [the documentation for the template and parameter file formats](https://github.com/Azure/azure-batch-cli-extensions/blob/master/doc/templates.md).
 
 * **Azure: Create Batch Pool:** Similar to Create Batch Job but creates a pool from a template or JSON.
 
