@@ -96,7 +96,7 @@ async function createResourceImpl(doc : vscode.TextDocument, resourceType : batc
 
     const knownParametersText = getParameterJson(parameterFile);
     const knownParameters = batch.parseParameters(knownParametersText);
-    const isKnownParameter = (n : string) => knownParameters.findIndex((p) => p.name == n) >= 0;
+    const isKnownParameter = (n : string) => knownParameters.findIndex((p) => p.name === n) >= 0;
     const anyUnknownParameters = templateInfo.parameters.findIndex((p) => !isKnownParameter(p.name)) >= 0;
 
     const tempParameterInfo = anyUnknownParameters ? await createTempParameterFile(templateInfo, knownParameters) : undefined;
@@ -169,7 +169,7 @@ function getParameterJson(parameterFile : IParameterFileInfo) : string {
 async function createTempParameterFile(jobTemplateInfo : batch.IBatchResource, knownParameters : batch.IParameterValue[]) : Promise<ITempFileInfo | undefined> {
     let parameterObject : any = {};
     for (const p of jobTemplateInfo.parameters) {
-        const known = knownParameters.find((pv) => pv.name == p.name);
+        const known = knownParameters.find((pv) => pv.name === p.name);
         const value = known ? known.value : await promptForParameterValue(p);
         if (value) {
             parameterObject[p.name] = value;
@@ -389,9 +389,9 @@ function findProperty(symbols: vscode.SymbolInformation[], position: vscode.Posi
 }
 
 function getParameterTypeName(value : any) : string {
-    return (value instanceof Number || typeof value == 'number') ? 'integer' :
-        (value instanceof Boolean || typeof value == 'boolean') ? 'boolean' :
-        (value instanceof String || typeof value == 'string') ? 'string' :
+    return (value instanceof Number || typeof value === 'number') ? 'integer' :
+        (value instanceof Boolean || typeof value === 'boolean') ? 'boolean' :
+        (value instanceof String || typeof value === 'string') ? 'string' :
         'object';
 }
 
@@ -433,7 +433,7 @@ class ParameterReferenceCompletionItemProvider implements vscode.CompletionItemP
 async function provideCompletionItemsCore(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken) : Promise<vscode.CompletionItem[]> {
     const sis : vscode.SymbolInformation[] = await getJsonSymbols(document);  // We use this rather than JSON.parse because the document is likely to be invalid JSON at the time the user is in the middle of typing the completion trigger
     if (sis) {
-        return sis.filter((si) => si.containerName == 'parameters')
+        return sis.filter((si) => si.containerName === 'parameters')
                   .map((si) => completionItemFor(si));
     }
     return [];
@@ -465,7 +465,7 @@ function parameterRefs(text : string) : IParameterRefMatch[] {
 }
 
 async function diagnoseTemplateProblems(document : vscode.TextDocument) : Promise<void> {
-    if (document.languageId != 'json') {
+    if (document.languageId !== 'json') {
         return;
     }
 
@@ -473,7 +473,7 @@ async function diagnoseTemplateProblems(document : vscode.TextDocument) : Promis
 
     const sis : vscode.SymbolInformation[] = await getJsonSymbols(document);
     if (sis && sis.length > 0 /* don't report warnings just because the symbols haven't loaded yet */) {
-        const paramNames = sis.filter((si) => si.containerName == 'parameters')
+        const paramNames = sis.filter((si) => si.containerName === 'parameters')
                               .map((si) => si.name);
         const paramRefs = parameterRefs(document.getText());
         if (paramRefs) {

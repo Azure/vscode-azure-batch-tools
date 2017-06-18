@@ -9,7 +9,7 @@ export class AzureBatchProvider implements vscode.TreeDataProvider<AzureBatchTre
 	private _onDidChangeTreeData: vscode.EventEmitter<AzureBatchTreeNode | undefined> = new vscode.EventEmitter<AzureBatchTreeNode | undefined>();
 	readonly onDidChangeTreeData: vscode.Event<AzureBatchTreeNode | undefined> = this._onDidChangeTreeData.event;
     getTreeItem(abtn : AzureBatchTreeNode) : vscode.TreeItem {
-        const collapsibleState = abtn.kind == 'root' ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None;
+        const collapsibleState = abtn.kind === 'root' ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None;
         let item = new vscode.TreeItem(abtn.text, collapsibleState);
         item.contextValue = 'azure.batch.' + abtn.kind;
         if (isResourceNode(abtn)) {
@@ -55,11 +55,11 @@ export class AzureBatchProvider implements vscode.TreeDataProvider<AzureBatchTre
 }
 
 function isRootNode(node : AzureBatchTreeNode) : node is RootNode {
-    return node.kind == 'root';
+    return node.kind === 'root';
 }
 
 function isResourceNode(node : AzureBatchTreeNode) : node is ResourceNode {
-    return node.kind == 'resource';
+    return node.kind === 'resource';
 }
 
 export interface AzureBatchTreeNode {

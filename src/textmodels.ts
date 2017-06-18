@@ -26,7 +26,7 @@ function indentLines(text : string, amount : number) : string {
 }
 
 function isSingleLine(range: vscode.Range) {
-    return range.start.line == range.end.line;
+    return range.start.line === range.end.line;
 }
 
 function lineStart(pos: vscode.Position) {
@@ -38,8 +38,8 @@ function immediatelyBefore(pos: vscode.Position) {
 }
 
 function templateParameterInsertionEditProvider(jsonSymbols : vscode.SymbolInformation[], propertyName : string, newParameterDefn : any) : IEditProvider {
-    const parametersElement = jsonSymbols.find((s) => s.name == 'parameters' && !s.containerName);
-    const parameterSymbols = jsonSymbols.filter((s) => s.containerName == 'parameters');
+    const parametersElement = jsonSymbols.find((s) => s.name === 'parameters' && !s.containerName);
+    const parameterSymbols = jsonSymbols.filter((s) => s.containerName === 'parameters');
     const lastExistingParameter = parameterSymbols.length > 0 ? parameterSymbols.reverse()[0] : undefined;  // not sure what order guarantees the symbol provider makes, but it's not critical if this isn't actually the last one
 
     class InsertAfterExistingParameter implements IEditProvider {

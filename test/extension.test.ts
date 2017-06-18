@@ -218,7 +218,7 @@ suite('Batch Utilities Tests', () => {
     test('Parsing job template JSON captures default values', () => {
         const template = <batch.IBatchResource>batch.parseBatchTemplate(jobTemplateJson, 'job');
         
-        const parameter = template.parameters.find((p) => p.name == 'testDefaulted');
+        const parameter = template.parameters.find((p) => p.name === 'testDefaulted');
 
         assert.notEqual(undefined, parameter);
         if (parameter) {
@@ -229,7 +229,7 @@ suite('Batch Utilities Tests', () => {
     test('Parsing job template JSON captures allowed values', () => {
         const template = <batch.IBatchResource>batch.parseBatchTemplate(jobTemplateJson, 'job');
         
-        const parameter = template.parameters.find((p) => p.name == 'testAllowed');
+        const parameter = template.parameters.find((p) => p.name === 'testAllowed');
 
         assert.notEqual(undefined, parameter);
         if (parameter) {

@@ -28,7 +28,7 @@ function looksLikeTemplate(json : any, resourceType : BatchResourceType) : boole
     }
 
     if (resourceDecl.type && resourceDecl.properties) {
-        return resourceDecl.type == templateResourceType(resourceType);
+        return resourceDecl.type === templateResourceType(resourceType);
     }
 
     return false;
