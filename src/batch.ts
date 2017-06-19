@@ -2,20 +2,20 @@ import { IShellExecResult, ICommandError } from './shell';
 import * as duration from './duration';
 import * as host from './host';
 
-export function parseBatchTemplate(text : string, resourceType : BatchResourceType) : IBatchResource | null {
+export function parseBatchTemplate(text : string, resourceType : BatchResourceType) : IBatchResource {
     try {
         const jobject : any = JSON.parse(text);
         if (!jobject) {
-            return null;
+            return { isTemplate: false, templateValidationFailure: 'Unable to parse current document as a JSON file', parameters: [] };
         }
 
         if (looksLikeTemplate(jobject, resourceType)) {
             return parseTemplateCore(jobject);
         }
 
-        return { isTemplate: false, parameters: [] };
+        return { isTemplate: false, templateValidationFailure: `Current document is not a template - expected a ${resourceType} element with type ${templateResourceType(resourceType)}`, parameters: [] };
     } catch (SyntaxError) {
-        return null;
+        return { isTemplate: false, templateValidationFailure: 'Unable to parse current document as a JSON file', parameters: [] };
     }
 }
 
@@ -58,7 +58,7 @@ function parseTemplateCore(json : any) : IBatchResource {
         })
     }
 
-    return { isTemplate: true, parameters: parameters };
+    return { isTemplate: true, templateValidationFailure: '', parameters: parameters };
 }
 
 export function parseParameters(text : string) : IParameterValue[] {
@@ -194,6 +194,7 @@ function unsettablePropertiesCore(resourceType : BatchResourceType) : string[] {
 
 export interface IBatchResource {
     readonly isTemplate : boolean;
+    readonly templateValidationFailure : string;
     readonly parameters : IBatchTemplateParameter[];
 }
 

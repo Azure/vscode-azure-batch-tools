@@ -77,8 +77,8 @@ function createPool() {
 async function createResourceImpl(doc : vscode.TextDocument, resourceType : batch.BatchResourceType) {
 
     const templateInfo = batch.parseBatchTemplate(doc.getText(), resourceType);
-    if (!templateInfo) {
-        await vscode.window.showErrorMessage(`Current file is not an Azure Batch ${resourceType} template.`);
+    if (!templateInfo.isTemplate) {
+        await vscode.window.showErrorMessage(templateInfo.templateValidationFailure);
         return;
     }
 
