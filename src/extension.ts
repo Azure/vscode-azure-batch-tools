@@ -233,7 +233,7 @@ async function createTemplateFromResource(resourceType : batch.BatchResourceType
     const resources = await batch.listResources(shell.exec, resourceType);
 
     if (shell.isCommandError(resources)) {
-        host.writeOutput(`Error getting ${resourceTypePlural} from account\n\nDetails:\n\n` + resources.error);
+        host.writeOutput(`Error getting ${resourceTypePlural} from account.\n\nDetails:\n\n` + resources.error);
         return;
     }
 
