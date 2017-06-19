@@ -131,6 +131,14 @@
           },
           "title": "A list of name-value pairs associated with the pool as metadata.",
           "description": "A list of name-value pairs associated with the pool as metadata."
+        },
+        "packageReferences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PackageReference"
+          },
+          "title": "Biscotti!",
+          "description": "Biscotti!"
         }
       },
       "required": [
@@ -335,6 +343,12 @@
           "type": "string",
           "title": "The file permission mode attribute in octal format.",
           "description": "The file permission mode attribute in octal format."
+        },
+        "source": {
+          "type": "object",
+          "$ref": "#/definitions/ResourceFileSource",
+          "title": "TBD.",
+          "description": "TBD."
         }
       },
       "required": [
@@ -342,6 +356,23 @@
         "filePath"
       ],
       "title": "A file to be downloaded from Azure blob storage to a compute node."
+    },
+    "ResourceFileSource": {
+      "properties": {
+        "fileGroup": {
+          "type": "string",
+          "title": "TBD",
+          "description": "TBD"
+        },
+        "prefix": {
+          "type": "string",
+          "title": "TBD",
+          "description": "TBD"
+        }
+      },
+      "required": [
+        "fileGroup"
+      ]
     },
     "EnvironmentSetting": {
       "properties": {
@@ -578,6 +609,39 @@
       ],
       "title": "A name-value pair associated with a Batch service resource.",
       "description": "The Batch service does not assign any meaning to this metadata; it is solely for the use of user code."
+    },
+    "PackageReference": {
+      "properties": {
+        "type": {
+          "type": "string",
+          "title": "The type of package - aptPackage, chocolateyPackage, or yumPackage",
+          "description": "The type of package - aptPackage, chocolateyPackage, or yumPackage"
+        },
+        "id": {
+          "type": "string",
+          "title": "TBD",
+          "description": "TBD"
+        },
+        "version": {
+          "type": "string",
+          "title": "TBD",
+          "description": "TBD"
+        },
+        "allowEmptyChecksums": {
+          "type": "boolean",
+          "title": "TBD",
+          "description": "TBD"
+        },
+        "disableExcludes": {
+          "type": "string",
+          "title": "TBD",
+          "description": "TBD"
+        }
+      },
+      "required": [
+        "type",
+        "id"
+      ]
     }
   }
 }

@@ -4,11 +4,16 @@ import * as batch from '../src/batch';
 import * as path from 'path';
 import * as fs from 'fs';
 
-writeResourceSchema('pool').then(() => {console.log('done');});
+writeResourceSchemas().then(() => {console.log('done');});
 
 // TODO:
 // * CLI extensions (e.g. taskFactory element)
 // * smartness around combinations (e.g. oneOf poolId or autoPoolSpecification)
+
+async function writeResourceSchemas() {
+    await writeResourceSchema('job');
+    await writeResourceSchema('pool');
+}
 
 async function writeResourceSchema(resourceType : batch.BatchResourceType) : Promise<void> {
     const schema = await createResourceSchema(resourceType);
@@ -20,6 +25,7 @@ async function writeResourceSchema(resourceType : batch.BatchResourceType) : Pro
 async function createResourceSchema(resourceType : batch.BatchResourceType) : Promise<any> {
     let schemaDefinitions : any = {};
     const swagger = await fetchSwagger();
+    extendSchemaForBatchExtensions(swagger.definitions);
     const addResourceOperation = swagger.paths[resourcePath(resourceType)].post;
     const addResourceBodySchemaRef : string = addResourceOperation.parameters[0 /* <- TODO: !!! */].schema['$ref'];
 
@@ -40,6 +46,22 @@ async function createResourceSchema(resourceType : batch.BatchResourceType) : Pr
     };
 
     return schema;
+}
+
+function extendSchemaForBatchExtensions(definitions: any) : void {
+    const extensionsText = fs.readFileSync(path.join(__dirname, `../../tools/extensions.schema.json`), 'utf8');
+    const extensions : any = JSON.parse(extensionsText);
+    mergeExtensions(extensions, definitions);
+}
+
+function mergeExtensions(extensions: any, base: any) {
+    for (const p in extensions) {
+        if (base[p]) {
+            base[p].properties = Object.assign(base[p].properties, extensions[p].properties);
+        } else {
+            base[p] = extensions[p];
+        }
+    }
 }
 
 function chaseRef(swagger: any, ref: string) : { name: string, schema: any } {

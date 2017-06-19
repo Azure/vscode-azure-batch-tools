@@ -76,6 +76,18 @@
           "type": "boolean",
           "title": "The flag that determines if this job will use tasks with dependencies.",
           "description": "The flag that determines if this job will use tasks with dependencies."
+        },
+        "taskFactory": {
+          "type": "object",
+          "title": "Biscotti!",
+          "$ref": "#/definitions/TaskFactory",
+          "description": "Biscotti!"
+        },
+        "applicationTemplateInfo": {
+          "type": "object",
+          "title": "Biscotti!",
+          "$ref": "#/definitions/ApplicationTemplateInfo",
+          "description": "Biscotti!"
         }
       },
       "required": [
@@ -203,6 +215,12 @@
           "type": "string",
           "title": "The file permission mode attribute in octal format.",
           "description": "The file permission mode attribute in octal format."
+        },
+        "source": {
+          "type": "object",
+          "$ref": "#/definitions/ResourceFileSource",
+          "title": "TBD.",
+          "description": "TBD."
         }
       },
       "required": [
@@ -210,6 +228,23 @@
         "filePath"
       ],
       "title": "A file to be downloaded from Azure blob storage to a compute node."
+    },
+    "ResourceFileSource": {
+      "properties": {
+        "fileGroup": {
+          "type": "string",
+          "title": "TBD",
+          "description": "TBD"
+        },
+        "prefix": {
+          "type": "string",
+          "title": "TBD",
+          "description": "TBD"
+        }
+      },
+      "required": [
+        "fileGroup"
+      ]
     },
     "OutputFile": {
       "properties": {
@@ -1057,6 +1092,387 @@
       "x-ms-enum": {
         "name": "OnTaskFailure",
         "modelAsString": false
+      }
+    },
+    "TaskFactory": {
+      "properties": {
+        "type": {
+          "type": "string",
+          "title": "The type of task factory - taskCollection, parametricSweep or taskPerFile",
+          "description": "The type of task factory - taskCollection, parametricSweep or taskPerFile"
+        },
+        "tasks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TaskAddParameter"
+          },
+          "title": "The tasks that make up the job.",
+          "description": "The tasks that make up the job."
+        },
+        "parameterSets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ParametricSweepParameterSet"
+          },
+          "title": "TBD",
+          "description": "TBD"
+        },
+        "repeatTask": {
+          "type": "object",
+          "$ref": "#/definitions/TaskAddParameter",
+          "title": "The task that is to be repeated for each value.",
+          "description": "The task that is to be repeated for each value."
+        },
+        "source": {
+          "type": "object",
+          "$ref": "#/definitions/TaskPerFileSource",
+          "title": "TBD.",
+          "description": "TBD."
+        }
+      }
+    },
+    "TaskAddParameter": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "A string that uniquely identifies the task within the job.",
+          "description": "A string that uniquely identifies the task within the job."
+        },
+        "displayName": {
+          "type": "string",
+          "title": "A display name for the task.",
+          "description": "A display name for the task."
+        },
+        "commandLine": {
+          "type": "string",
+          "title": "The command line of the task.",
+          "description": "The command line of the task."
+        },
+        "exitConditions": {
+          "$ref": "#/definitions/ExitConditions"
+        },
+        "resourceFiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ResourceFile"
+          },
+          "title": "A list of files that the Batch service will download to the compute node before running the command line.",
+          "description": "A list of files that the Batch service will download to the compute node before running the command line."
+        },
+        "outputFiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OutputFile"
+          },
+          "title": "A list of files that the Batch service will upload from the compute node after running the command line.",
+          "description": "A list of files that the Batch service will upload from the compute node after running the command line."
+        },
+        "environmentSettings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EnvironmentSetting"
+          },
+          "title": "A list of environment variable settings for the task.",
+          "description": "A list of environment variable settings for the task."
+        },
+        "affinityInfo": {
+          "$ref": "#/definitions/AffinityInformation",
+          "title": "A locality hint that can be used by the Batch service to select a compute node on which to start the new task.",
+          "description": "A locality hint that can be used by the Batch service to select a compute node on which to start the new task."
+        },
+        "constraints": {
+          "$ref": "#/definitions/TaskConstraints",
+          "title": "The execution constraints that apply to this task.",
+          "description": "The execution constraints that apply to this task."
+        },
+        "userIdentity": {
+          "$ref": "#/definitions/UserIdentity",
+          "title": "The user identity under which the task runs.",
+          "description": "The user identity under which the task runs."
+        },
+        "multiInstanceSettings": {
+          "$ref": "#/definitions/MultiInstanceSettings",
+          "title": "An object that indicates that the task is a multi-instance task, and contains information about how to run the multi-instance task.",
+          "description": "An object that indicates that the task is a multi-instance task, and contains information about how to run the multi-instance task."
+        },
+        "dependsOn": {
+          "$ref": "#/definitions/TaskDependencies",
+          "title": "The tasks that this task depends on.",
+          "description": "The tasks that this task depends on."
+        },
+        "applicationPackageReferences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ApplicationPackageReference"
+          },
+          "title": "A list of application packages that the Batch service will deploy to the compute node before running the command line.",
+          "description": "A list of application packages that the Batch service will deploy to the compute node before running the command line."
+        },
+        "authenticationTokenSettings": {
+          "title": "The settings for an authentication token that the task can use to perform Batch service operations.",
+          "description": "The settings for an authentication token that the task can use to perform Batch service operations.",
+          "$ref": "#/definitions/AuthenticationTokenSettings"
+        }
+      },
+      "required": [
+        "id",
+        "commandLine"
+      ],
+      "title": "An Azure Batch task to add."
+    },
+    "ExitConditions": {
+      "properties": {
+        "exitCodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ExitCodeMapping"
+          },
+          "title": "A list of individual task exit codes and how the Batch service should respond to them.",
+          "description": "A list of individual task exit codes and how the Batch service should respond to them."
+        },
+        "exitCodeRanges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ExitCodeRangeMapping"
+          },
+          "title": "A list of task exit code ranges and how the Batch service should respond to them.",
+          "description": "A list of task exit code ranges and how the Batch service should respond to them."
+        },
+        "preProcessingError": {
+          "$ref": "#/definitions/ExitOptions",
+          "title": "How the Batch service should respond if the task fails to start due to an error.",
+          "description": "How the Batch service should respond if the task fails to start due to an error."
+        },
+        "fileUploadError": {
+          "$ref": "#/definitions/ExitOptions",
+          "title": "How the Batch service should respond if a file upload error occurs.",
+          "description": "How the Batch service should respond if a file upload error occurs."
+        },
+        "default": {
+          "$ref": "#/definitions/ExitOptions",
+          "title": "How the Batch service should respond if the task fails with an exit condition not covered by any of the other properties.",
+          "description": "How the Batch service should respond if the task fails with an exit condition not covered by any of the other properties."
+        }
+      },
+      "title": "Specifies how the Batch service should respond when the task completes."
+    },
+    "ExitCodeMapping": {
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "title": "A process exit code.",
+          "description": "A process exit code."
+        },
+        "exitOptions": {
+          "$ref": "#/definitions/ExitOptions",
+          "title": "How the Batch service should respond if the task exits with this exit code.",
+          "description": "How the Batch service should respond if the task exits with this exit code."
+        }
+      },
+      "title": "How the Batch service should respond if a task exits with a particular exit code.",
+      "required": [
+        "code",
+        "exitOptions"
+      ]
+    },
+    "ExitOptions": {
+      "properties": {
+        "jobAction": {
+          "type": "string",
+          "title": "An action to take on the job containing the task, if the task completes with the given exit condition and the job's onTaskFailed property is 'performExitOptionsJobAction'.",
+          "description": "An action to take on the job containing the task, if the task completes with the given exit condition and the job's onTaskFailed property is 'performExitOptionsJobAction'.",
+          "enum": [
+            "none",
+            "disable",
+            "terminate"
+          ],
+          "x-ms-enum": {
+            "name": "JobAction",
+            "modelAsString": false
+          }
+        },
+        "dependencyAction": {
+          "type": "string",
+          "title": "An action that the Batch service performs on tasks that depend on this task.",
+          "description": "An action that the Batch service performs on tasks that depend on this task.",
+          "enum": [
+            "satisfy",
+            "block"
+          ],
+          "x-ms-enum": {
+            "name": "DependencyAction",
+            "modelAsString": false
+          }
+        }
+      },
+      "title": "Specifies how the Batch service responds to a particular exit condition."
+    },
+    "ExitCodeRangeMapping": {
+      "properties": {
+        "start": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The first exit code in the range.",
+          "description": "The first exit code in the range."
+        },
+        "end": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The last exit code in the range.",
+          "description": "The last exit code in the range."
+        },
+        "exitOptions": {
+          "$ref": "#/definitions/ExitOptions",
+          "title": "How the Batch service should respond if the task exits with an exit code in the range start to end (inclusive).",
+          "description": "How the Batch service should respond if the task exits with an exit code in the range start to end (inclusive)."
+        }
+      },
+      "title": "A range of exit codes and how the Batch service should respond to exit codes within that range.",
+      "required": [
+        "start",
+        "end",
+        "exitOptions"
+      ]
+    },
+    "AffinityInformation": {
+      "properties": {
+        "affinityId": {
+          "type": "string",
+          "title": "An opaque string representing the location of a compute node or a task that has run previously.",
+          "description": "An opaque string representing the location of a compute node or a task that has run previously."
+        }
+      },
+      "required": [
+        "affinityId"
+      ],
+      "title": "A locality hint that can be used by the Batch service to select a compute node on which to start a task."
+    },
+    "MultiInstanceSettings": {
+      "properties": {
+        "numberOfInstances": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The number of compute nodes required by the task.",
+          "description": "The number of compute nodes required by the task."
+        },
+        "coordinationCommandLine": {
+          "type": "string",
+          "title": "The command line to run on all the compute nodes to enable them to coordinate when the primary runs the main task command.",
+          "description": "The command line to run on all the compute nodes to enable them to coordinate when the primary runs the main task command."
+        },
+        "commonResourceFiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ResourceFile"
+          },
+          "title": "A list of files that the Batch service will download before running the coordination command line.",
+          "description": "A list of files that the Batch service will download before running the coordination command line."
+        }
+      },
+      "required": [
+        "numberOfInstances"
+      ],
+      "title": "Settings which specify how to run a multi-instance task.",
+      "description": "Multi-instance tasks are commonly used to support MPI tasks."
+    },
+    "TaskDependencies": {
+      "properties": {
+        "taskIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "The list of task IDs that this task depends on. All tasks in this list must complete successfully before the dependent task can be scheduled.",
+          "description": "The list of task IDs that this task depends on. All tasks in this list must complete successfully before the dependent task can be scheduled."
+        },
+        "taskIdRanges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TaskIdRange"
+          },
+          "title": "The list of task ID ranges that this task depends on. All tasks in all ranges must complete successfully before the dependent task can be scheduled.",
+          "description": "The list of task ID ranges that this task depends on. All tasks in all ranges must complete successfully before the dependent task can be scheduled."
+        }
+      },
+      "title": "Specifies any dependencies of a task. Any task that is explicitly specified or within a dependency range must complete before the dependant task will be scheduled."
+    },
+    "TaskIdRange": {
+      "properties": {
+        "start": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The first task ID in the range.",
+          "description": "The first task ID in the range."
+        },
+        "end": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The last task ID in the range.",
+          "description": "The last task ID in the range."
+        }
+      },
+      "title": "A range of task IDs that a task can depend on. All tasks with IDs in the range must complete successfully before the dependent task can be scheduled.",
+      "description": "The start and end of the range are inclusive. For example, if a range has start 9 and end 12, then it represents tasks '9', '10', '11' and '12'.",
+      "required": [
+        "start",
+        "end"
+      ]
+    },
+    "ParametricSweepParameterSet": {
+      "properties": {
+        "start": {
+          "type": "integer",
+          "title": "TBD",
+          "description": "TBD"
+        },
+        "end": {
+          "type": "integer",
+          "title": "TBD",
+          "description": "TBD"
+        },
+        "step": {
+          "type": "integer",
+          "title": "TBD",
+          "description": "TBD"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ]
+    },
+    "TaskPerFileSource": {
+      "properties": {
+        "fileGroup": {
+          "type": "string",
+          "title": "TBD",
+          "description": "TBD"
+        },
+        "containerUrl": {
+          "type": "string",
+          "title": "TBD",
+          "description": "TBD"
+        },
+        "prefix": {
+          "type": "string",
+          "title": "TBD",
+          "description": "TBD"
+        }
+      }
+    },
+    "ApplicationTemplateInfo": {
+      "properties": {
+        "filePath": {
+          "type": "string",
+          "title": "TBD",
+          "description": "TBD"
+        },
+        "parameters": {
+          "type": "object",
+          "title": "TBD",
+          "description": "TBD"
+        }
       }
     }
   }

@@ -1,0 +1,163 @@
+{
+    "JobAddParameter": {
+        "properties": {
+            "taskFactory" : {
+                "type": "object",
+                "title": "Biscotti!",
+                "$ref": "#/definitions/TaskFactory"
+            },
+            "applicationTemplateInfo" : {
+                "type": "object",
+                "title": "Biscotti!",
+                "$ref": "#/definitions/ApplicationTemplateInfo"
+            }
+
+        }
+    },
+    "PoolAddParameter": {
+        "properties": {
+            "packageReferences" : {
+                "type": "array",
+                "items": {
+                    "$ref": "#/definitions/PackageReference"
+                },
+                "title": "Biscotti!"
+            }
+        }
+    },
+    "TaskAddParameter": {
+        "properties": {
+            "packageReferences" : {
+                "type": "array",
+                "items": {
+                    "$ref": "#/definitions/PackageReference"
+                },
+                "title": "Biscotti!"
+            }
+        }
+    },
+    "PackageReference": {
+        "properties":{
+            "type": {
+                "type": "string",
+                "title": "The type of package - aptPackage, chocolateyPackage, or yumPackage"
+            },
+            "id": {
+                "type": "string",
+                "title": "TBD"
+            },
+            "version": {
+                "type": "string",
+                "title": "TBD"
+            },
+            "allowEmptyChecksums": {
+                "type": "boolean",
+                "title": "TBD"
+            },
+            "disableExcludes": {
+                "type": "string",
+                "title": "TBD"
+            }
+        },
+        "required": ["type", "id"]
+    },
+    "TaskFactory": {
+        "properties":{
+            "type": {
+                "type": "string",
+                "title": "The type of task factory - taskCollection, parametricSweep or taskPerFile"
+            },
+            "tasks": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/definitions/TaskAddParameter"
+                },
+                "title": "The tasks that make up the job."
+            },
+            "parameterSets": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/definitions/ParametricSweepParameterSet"
+                },
+                "title": "TBD"
+            },
+            "repeatTask": {
+                "type": "object",
+                "$ref": "#/definitions/TaskAddParameter", /* TODO: except for id and dependsOn */
+                "title": "The task that is to be repeated for each value."
+            },
+            "source": {
+                "type": "object",
+                "$ref": "#/definitions/TaskPerFileSource",
+                "title": "TBD."
+            }
+        }
+    },
+    "ParametricSweepParameterSet": {
+        "properties": {
+            "start": {
+                "type": "integer",
+                "title": "TBD"
+            },
+            "end": {
+                "type": "integer",
+                "title": "TBD"
+            },
+            "step": {
+                "type": "integer",
+                "title": "TBD"
+            }
+        },
+        "required": ["start", "end"]
+    },
+    "TaskPerFileSource": {
+        "properties": {
+            "fileGroup": {
+                "type": "string",
+                "title": "TBD"
+            },
+            "containerUrl": {
+                "type": "string",
+                "title": "TBD"
+            },
+            "prefix": {
+                "type": "string",
+                "title": "TBD"
+            }
+        }
+    },
+    "ApplicationTemplateInfo": {
+        "properties":{
+            "filePath": {
+                "type": "string",
+                "title": "TBD"
+            },
+            "parameters": {
+                "type": "object",
+                "title": "TBD"
+            }
+        }
+    },
+    "ResourceFile": {
+        "properties": {
+            "source": {
+                "type": "object",
+                "$ref": "#/definitions/ResourceFileSource",
+                "title": "TBD."
+            }
+        }
+    },
+    "ResourceFileSource": {
+        "properties": {
+            "fileGroup": {
+                "type": "string",
+                "title": "TBD"
+            },
+            "prefix": {
+                "type": "string",
+                "title": "TBD"
+            }
+        },
+        "required": ["fileGroup"]
+    }
+}
