@@ -565,19 +565,33 @@
       "title": "A Job Release task to run on job completion on any compute node where the job has run."
     },
     "PoolInformation": {
-      "properties": {
-        "poolId": {
-          "type": "string",
-          "title": "The ID of an existing pool. All the tasks of the job will run on the specified pool.",
-          "description": "The ID of an existing pool. All the tasks of the job will run on the specified pool."
+      "title": "Specifies how a job should be assigned to a pool.",
+      "oneOf": [
+        {
+          "properties": {
+            "poolId": {
+              "type": "string",
+              "title": "The ID of an existing pool. All the tasks of the job will run on the specified pool.",
+              "description": "The ID of an existing pool. All the tasks of the job will run on the specified pool."
+            }
+          },
+          "required": [
+            "poolId"
+          ]
         },
-        "autoPoolSpecification": {
-          "$ref": "#/definitions/AutoPoolSpecification",
-          "title": "Characteristics for a temporary 'auto pool'. The Batch service will create this auto pool when the job is submitted.",
-          "description": "Characteristics for a temporary 'auto pool'. The Batch service will create this auto pool when the job is submitted."
+        {
+          "properties": {
+            "autoPoolSpecification": {
+              "$ref": "#/definitions/AutoPoolSpecification",
+              "title": "Characteristics for a temporary 'auto pool'. The Batch service will create this auto pool when the job is submitted.",
+              "description": "Characteristics for a temporary 'auto pool'. The Batch service will create this auto pool when the job is submitted."
+            }
+          },
+          "required": [
+            "autoPoolSpecification"
+          ]
         }
-      },
-      "title": "Specifies how a job should be assigned to a pool."
+      ]
     },
     "AutoPoolSpecification": {
       "properties": {

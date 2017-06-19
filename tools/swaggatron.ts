@@ -25,7 +25,17 @@ const implicitExtensionTypes = [
         "basedOn": "TaskAddParameter",
         "removing": ["id", "dependsOn"]
     }
-]
+];
+
+const eitherOrGroups = [
+    {
+        "declaringType": "PoolInformation",
+        "groups": [
+            [{ "name": "poolId", "required": "true" }],
+            [{ "name": "autoPoolSpecification", "required": "true" }]
+        ]
+    }
+];
 
 async function writeResourceSchemas() {
     await writeResourceSchema('job');
@@ -52,6 +62,8 @@ async function createResourceSchema(resourceType : batch.BatchResourceType) : Pr
     mungeSchema(schemaDefinitions[bodySchema.name]);
 
     recursivelyAddDefns(swagger, bodySchema.schema, schemaDefinitions);
+
+    enrichSchema(schemaDefinitions);  // do this here to save us having to deal with oneOf etc. in the recursive addition process
 
     const schema : any = {
         ["$schema"]: "http://json-schema.org/draft-04/schema#",
@@ -95,6 +107,27 @@ function fillInImplicitExtensionTypes(definitions: any) {
         definition.description = basedOn.description;
         definition.required = basedOn.required.filter((p : string) => extensionType.removing.indexOf(p) < 0);
         definitions[extensionType.name] = definition;
+    }
+}
+
+function enrichSchema(definitions: any) {
+    for (const group of eitherOrGroups) {
+        let declaringType = definitions[group.declaringType];
+        if (declaringType) {  // we run this after filtering to the job or pool subset, so some enrichments may not relate to the definitions at hand
+            let allowedSchemas : any[] = [];
+            for (const groupSpec of group.groups) {
+                let groupDefn : any = { properties: { }, required: declaringType.required || [] };
+                for (const p of groupSpec) {
+                    groupDefn.properties[p.name] = declaringType.properties[p.name];
+                    if (p.required) {
+                        groupDefn.required.push(p.name);
+                    }
+                }
+                allowedSchemas.push(groupDefn);            
+            }
+            declaringType.oneOf = allowedSchemas;
+            delete declaringType.properties;
+        }
     }
 }
 
