@@ -7,8 +7,17 @@ import * as fs from 'fs';
 writeResourceSchemas().then(() => {console.log('done');});
 
 // TODO:
-// * CLI extensions (e.g. taskFactory element)
 // * smartness around combinations (e.g. oneOf poolId or autoPoolSpecification)
+//   * can we handle the tweaking of TaskAddParameter for repeat tasks as part of this same transformation?
+
+// transformations:
+// * create a new definition by removing a property
+// * modify a definition by defining either-or groups
+//   * you must have ONE OF these groups
+//   * each group may contain 1 or more elements from the original type
+//   * these elements are removed from the top-level type
+//   * ??? an element may be restated in more than one group ???
+//   * some elements may become mandatory when restated at group level
 
 async function writeResourceSchemas() {
     await writeResourceSchema('job');
