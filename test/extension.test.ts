@@ -120,7 +120,7 @@ async function waitForSymbols(document : vscode.TextDocument) : Promise<vscode.S
     throw "symbols not ready after waiting";
 }
 
-async function assertParameterConversionResult(sourceFile : string, expectedResultFile : string, cursorPosition : vscode.Position) {
+async function assertParameterConversionTransformsFileTo(sourceFile : string, expectedResultFile : string, cursorPosition : vscode.Position) {
     const document = await vscode.workspace.openTextDocument(path.join(__dirname, '../../test/' + sourceFile));
     const expected = fs.readFileSync(path.join(__dirname, '../../test/' + expectedResultFile), 'utf8');
 
@@ -140,7 +140,7 @@ async function assertParameterConversionResult(sourceFile : string, expectedResu
 suite('Extension Tests', () => {
 
     test('When there is no parameters section, a new parameter is formatted correctly', async () => {
-        await assertParameterConversionResult(
+        await assertParameterConversionTransformsFileTo(
             'jobtemplate_noparams.json',
             'jobtemplate_noparams.after_poolid.json',
             new vscode.Position(7, 18)  // poolId
@@ -148,7 +148,7 @@ suite('Extension Tests', () => {
     });
 
     test('When there is an empty parameters section, a new parameter is formatted correctly', async () => {
-        await assertParameterConversionResult(
+        await assertParameterConversionTransformsFileTo(
             'jobtemplate_emptyparams.json',
             'jobtemplate_emptyparams.after_poolid.json',
             new vscode.Position(9, 18)  // poolId
@@ -156,7 +156,7 @@ suite('Extension Tests', () => {
     });
 
     test('When there is an empty parameters section and it is all on one line, a new parameter is formatted correctly', async () => {
-        await assertParameterConversionResult(
+        await assertParameterConversionTransformsFileTo(
             'jobtemplate_emptyparamsoneline.json',
             'jobtemplate_emptyparamsoneline.after_poolid.json',
             new vscode.Position(8, 18)  // poolId
@@ -164,10 +164,18 @@ suite('Extension Tests', () => {
     });
 
     test('When there are existing parameters, a new parameter is formatted correctly', async () => {
-        await assertParameterConversionResult(
+        await assertParameterConversionTransformsFileTo(
             'jobtemplate_oneparam.json',
             'jobtemplate_oneparam.after_poolid.json',
             new vscode.Position(15, 18)  // poolId
+        );
+    });
+
+    test('When there are existing parameters, new parameters are added at the end', async () => {
+        await assertParameterConversionTransformsFileTo(
+            'jobtemplate_multipleparams.json',
+            'jobtemplate_multipleparams.after_poolid.json',
+            new vscode.Position(21, 18)  // poolId
         );
     });
 
@@ -177,28 +185,23 @@ suite('Batch Utilities Tests', () => {
 
     test('Parsing a non-JSON document as a job template fails', () => {
         const result = batch.parseBatchTemplate(nonJson, 'job');
-        assert.equal(result, null);
+        assert.equal(result.isTemplate, false);
+        assert.equal(result.parameters.length, 0);
     });
 
     test('Parsing job JSON returns a non-template resource', () => {
         const result = batch.parseBatchTemplate(jobJson, 'job');
-        assert.notEqual(result, null);
-        if (result !== null) {
-          assert.equal(result.isTemplate, false);
-          assert.equal(result.parameters.length, 0);
-        }
+        assert.equal(result.isTemplate, false);
+        assert.equal(result.parameters.length, 0);
     });
 
     test('Parsing job template JSON returns a job resource template', () => {
         const template = batch.parseBatchTemplate(jobTemplateJson, 'job');
-        assert.notEqual(template, null);
-        if (template !== null) {
-          assert.equal(template.isTemplate, true);
-        }
+        assert.equal(template.isTemplate, true);
     });
 
     test('Parsing job template JSON surfaces the parameters', () => {
-        const template = <batch.IBatchResource>batch.parseBatchTemplate(jobTemplateJson, 'job');
+        const template = batch.parseBatchTemplate(jobTemplateJson, 'job');
         assert.equal(template.parameters.length, 4);
         
         const jobIdParameter = template.parameters[0];
@@ -211,12 +214,12 @@ suite('Batch Utilities Tests', () => {
     });
 
     test('A job template can be parsed even if it has no parameters', () => {
-        const template = <batch.IBatchResource>batch.parseBatchTemplate(jobTemplateJsonNoParams, 'job');
+        const template = batch.parseBatchTemplate(jobTemplateJsonNoParams, 'job');
         assert.equal(template.parameters.length, 0);
     });
 
     test('Parsing job template JSON captures default values', () => {
-        const template = <batch.IBatchResource>batch.parseBatchTemplate(jobTemplateJson, 'job');
+        const template = batch.parseBatchTemplate(jobTemplateJson, 'job');
         
         const parameter = template.parameters.find((p) => p.name === 'testDefaulted');
 
@@ -227,7 +230,7 @@ suite('Batch Utilities Tests', () => {
     });
 
     test('Parsing job template JSON captures allowed values', () => {
-        const template = <batch.IBatchResource>batch.parseBatchTemplate(jobTemplateJson, 'job');
+        const template = batch.parseBatchTemplate(jobTemplateJson, 'job');
         
         const parameter = template.parameters.find((p) => p.name === 'testAllowed');
 
@@ -242,7 +245,7 @@ suite('Batch Utilities Tests', () => {
     });
 
     test('Parsing pool template JSON surfaces the parameters', () => {
-        const template = <batch.IBatchResource>batch.parseBatchTemplate(poolTemplateJson, 'pool');
+        const template = batch.parseBatchTemplate(poolTemplateJson, 'pool');
         assert.equal(template.parameters.length, 1);
         
         assert.equal('vmSize', template.parameters[0].name);
