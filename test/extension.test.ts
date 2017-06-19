@@ -180,11 +180,6 @@ suite('Extension Tests', () => {
         );
     });
 
-    test('WEEEEEEEEEEEEEEEEEEEEEEEB', async () => {
-        let swag = await s.fetchSwagger();
-        console.log(`************** ${swag.host} **************`);
-    });
-
 });
 
 suite('Batch Utilities Tests', () => {

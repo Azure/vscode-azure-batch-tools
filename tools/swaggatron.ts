@@ -4,7 +4,7 @@ import * as batch from '../src/batch';
 import * as path from 'path';
 import * as fs from 'fs';
 
-writeResourceSchema('job').then(() => {console.log('done');});
+writeResourceSchema('pool').then(() => {console.log('done');});
 
 async function writeResourceSchema(resourceType : batch.BatchResourceType) : Promise<void> {
     const schema = await createResourceSchema(resourceType);
