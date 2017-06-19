@@ -136,6 +136,7 @@ async function getParameterFile(templateFileName : string, resourceType : batch.
     const parameterFileNames = [
         templateFileRoot + '.parameters.json',
         templateFileDir + `/${resourceType}parameters.json`,
+        templateFileDir + `/${resourceType}.parameters.json`,
         templateFileDir + `/parameters.${resourceType}.json`,
         templateFileDir + '/parameters.json'
     ];
