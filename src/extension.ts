@@ -85,7 +85,10 @@ async function createResourceImpl(doc : vscode.TextDocument, resourceType : batc
     const templateFileName = doc.fileName;  // TODO: handle the case where the doc has never been saved
 
     if (doc.isDirty) {
-        await doc.save();
+        const saved = await doc.save();
+        if (!saved) {
+            return;
+        }
     }
 
     // TODO: this results in the unnecessary creation and deletion of a temp file in
