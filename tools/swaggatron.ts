@@ -6,6 +6,10 @@ import * as fs from 'fs';
 
 writeResourceSchema('pool').then(() => {console.log('done');});
 
+// TODO:
+// * CLI extensions (e.g. taskFactory element)
+// * smartness around combinations (e.g. oneOf poolId or autoPoolSpecification)
+
 async function writeResourceSchema(resourceType : batch.BatchResourceType) : Promise<void> {
     const schema = await createResourceSchema(resourceType);
     const schemaText = JSON.stringify(schema, null, 2);
