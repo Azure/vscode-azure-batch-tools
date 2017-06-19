@@ -190,10 +190,7 @@ async function createTempParameterFile(jobTemplateInfo : batch.IBatchResource, k
 }
 
 async function promptForParameterValue(parameter : batch.IBatchTemplateParameter) : Promise<any> {
-    let description = '';
-    if (parameter.metadata) {
-        description = ` | ${parameter.metadata.description}`;
-    }
+    const description = (parameter.metadata && parameter.metadata.description) ? ` | ${parameter.metadata.description}` : '';
 
     if (parameter.allowedValues) {
         const allowedValueQuickPicks = parameter.allowedValues.map((v) => quickPickFor(v));
