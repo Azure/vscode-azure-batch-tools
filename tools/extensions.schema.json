@@ -83,7 +83,7 @@
             },
             "repeatTask": {
                 "type": "object",
-                "$ref": "#/definitions/TaskAddParameter", /* TODO: except for id and dependsOn */
+                "$ref": "#/definitions/RepeatTask",
                 "title": "The task that is to be repeated for each value."
             },
             "source": {

@@ -1119,7 +1119,7 @@
         },
         "repeatTask": {
           "type": "object",
-          "$ref": "#/definitions/TaskAddParameter",
+          "$ref": "#/definitions/RepeatTask",
           "title": "The task that is to be repeated for each value.",
           "description": "The task that is to be repeated for each value."
         },
@@ -1212,6 +1212,14 @@
           "title": "The settings for an authentication token that the task can use to perform Batch service operations.",
           "description": "The settings for an authentication token that the task can use to perform Batch service operations.",
           "$ref": "#/definitions/AuthenticationTokenSettings"
+        },
+        "packageReferences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PackageReference"
+          },
+          "title": "Biscotti!",
+          "description": "Biscotti!"
         }
       },
       "required": [
@@ -1419,6 +1427,39 @@
         "end"
       ]
     },
+    "PackageReference": {
+      "properties": {
+        "type": {
+          "type": "string",
+          "title": "The type of package - aptPackage, chocolateyPackage, or yumPackage",
+          "description": "The type of package - aptPackage, chocolateyPackage, or yumPackage"
+        },
+        "id": {
+          "type": "string",
+          "title": "TBD",
+          "description": "TBD"
+        },
+        "version": {
+          "type": "string",
+          "title": "TBD",
+          "description": "TBD"
+        },
+        "allowEmptyChecksums": {
+          "type": "boolean",
+          "title": "TBD",
+          "description": "TBD"
+        },
+        "disableExcludes": {
+          "type": "string",
+          "title": "TBD",
+          "description": "TBD"
+        }
+      },
+      "required": [
+        "type",
+        "id"
+      ]
+    },
     "ParametricSweepParameterSet": {
       "properties": {
         "start": {
@@ -1440,6 +1481,92 @@
       "required": [
         "start",
         "end"
+      ]
+    },
+    "RepeatTask": {
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "title": "A display name for the task.",
+          "description": "A display name for the task."
+        },
+        "commandLine": {
+          "type": "string",
+          "title": "The command line of the task.",
+          "description": "The command line of the task."
+        },
+        "exitConditions": {
+          "$ref": "#/definitions/ExitConditions"
+        },
+        "resourceFiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ResourceFile"
+          },
+          "title": "A list of files that the Batch service will download to the compute node before running the command line.",
+          "description": "A list of files that the Batch service will download to the compute node before running the command line."
+        },
+        "outputFiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OutputFile"
+          },
+          "title": "A list of files that the Batch service will upload from the compute node after running the command line.",
+          "description": "A list of files that the Batch service will upload from the compute node after running the command line."
+        },
+        "environmentSettings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EnvironmentSetting"
+          },
+          "title": "A list of environment variable settings for the task.",
+          "description": "A list of environment variable settings for the task."
+        },
+        "affinityInfo": {
+          "$ref": "#/definitions/AffinityInformation",
+          "title": "A locality hint that can be used by the Batch service to select a compute node on which to start the new task.",
+          "description": "A locality hint that can be used by the Batch service to select a compute node on which to start the new task."
+        },
+        "constraints": {
+          "$ref": "#/definitions/TaskConstraints",
+          "title": "The execution constraints that apply to this task.",
+          "description": "The execution constraints that apply to this task."
+        },
+        "userIdentity": {
+          "$ref": "#/definitions/UserIdentity",
+          "title": "The user identity under which the task runs.",
+          "description": "The user identity under which the task runs."
+        },
+        "multiInstanceSettings": {
+          "$ref": "#/definitions/MultiInstanceSettings",
+          "title": "An object that indicates that the task is a multi-instance task, and contains information about how to run the multi-instance task.",
+          "description": "An object that indicates that the task is a multi-instance task, and contains information about how to run the multi-instance task."
+        },
+        "applicationPackageReferences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ApplicationPackageReference"
+          },
+          "title": "A list of application packages that the Batch service will deploy to the compute node before running the command line.",
+          "description": "A list of application packages that the Batch service will deploy to the compute node before running the command line."
+        },
+        "authenticationTokenSettings": {
+          "title": "The settings for an authentication token that the task can use to perform Batch service operations.",
+          "description": "The settings for an authentication token that the task can use to perform Batch service operations.",
+          "$ref": "#/definitions/AuthenticationTokenSettings"
+        },
+        "packageReferences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PackageReference"
+          },
+          "title": "Biscotti!",
+          "description": "Biscotti!"
+        }
+      },
+      "title": "An Azure Batch task to add.",
+      "required": [
+        "commandLine"
       ]
     },
     "TaskPerFileSource": {

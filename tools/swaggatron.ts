@@ -11,13 +11,21 @@ writeResourceSchemas().then(() => {console.log('done');});
 //   * can we handle the tweaking of TaskAddParameter for repeat tasks as part of this same transformation?
 
 // transformations:
-// * create a new definition by removing a property
+// * create a new definition by removing a property - DONE
 // * modify a definition by defining either-or groups
 //   * you must have ONE OF these groups
 //   * each group may contain 1 or more elements from the original type
 //   * these elements are removed from the top-level type
 //   * ??? an element may be restated in more than one group ???
 //   * some elements may become mandatory when restated at group level
+
+const implicitExtensionTypes = [
+    {
+        "name": "RepeatTask",
+        "basedOn": "TaskAddParameter",
+        "removing": ["id", "dependsOn"]
+    }
+]
 
 async function writeResourceSchemas() {
     await writeResourceSchema('job');
@@ -70,6 +78,23 @@ function mergeExtensions(extensions: any, base: any) {
         } else {
             base[p] = extensions[p];
         }
+    }
+    fillInImplicitExtensionTypes(base);
+}
+
+function fillInImplicitExtensionTypes(definitions: any) {
+    for (const extensionType of implicitExtensionTypes) {
+        let basedOn = definitions[extensionType.basedOn];
+        let definition : any = { properties: { } }; // can't use Object.assign({}, definitions[extensionType.basedOn]); because of shallow copies
+        for (const property in basedOn.properties) {
+            if (extensionType.removing.indexOf(property) < 0) {
+                definition.properties[property] = basedOn.properties[property];
+            }
+        }
+        definition.title = basedOn.title;
+        definition.description = basedOn.description;
+        definition.required = basedOn.required.filter((p : string) => extensionType.removing.indexOf(p) < 0);
+        definitions[extensionType.name] = definition;
     }
 }
 
