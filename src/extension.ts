@@ -116,17 +116,17 @@ async function createResourceImpl(doc : vscode.TextDocument, resourceType : batc
 
     host.writeOutput(`Creating Azure Batch ${resourceType}...`);
 
-    shelljs.exec(`az batch ${resourceType} create ${commandOptions}`, { async: true }, (code : number, stdout : string, stderr : string) => {
-        cleanup();
-
-        if (code !== 0 || stderr) {  // TODO: figure out what to check (if anything) - problem is that the CLI can return exit code 0 on failure... but it writes to stderr on success too (the experimental feature warnings)
-            host.writeOutput(stderr);
+    try {
+        const execResult = await shell.exec(`az batch ${resourceType} create ${commandOptions}`);
+        if (execResult.exitCode !== 0 || execResult.error) {  // TODO: figure out what to check (if anything) - problem is that the CLI can return exit code 0 on failure... but it writes to stderr on success too (the experimental feature warnings)
+            host.writeOutput(execResult.error);
         } else {
-            host.writeOutput(stdout);
+            host.writeOutput(execResult.output);
         }
-
         host.writeOutput("Done");
-    });
+    } finally {
+        cleanup();
+    }
 }
 
 async function getParameterFile(templateFileName : string, resourceType : batch.BatchResourceType) : Promise<IParameterFileInfo> {
