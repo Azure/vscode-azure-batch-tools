@@ -7,4 +7,5 @@ src/**
 .gitignore
 tsconfig.json
 vsc-extension-quickstart.md
+out/tools/**
 tools/**
