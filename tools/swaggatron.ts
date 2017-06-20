@@ -27,15 +27,20 @@ const implicitExtensionTypes = [
     }
 ];
 
-const eitherOrGroups = [
-    {
-        "declaringType": "PoolInformation",
-        "groups": [
-            [{ "name": "poolId", "required": "true" }],
-            [{ "name": "autoPoolSpecification", "required": "true" }]
+const enrichments : any = {
+    PoolInformation: {
+        oneOf: [
+            { required: ["poolId"] },
+            { required: ["autoPoolSpecification"] }
+        ]
+    },
+    PoolAddParameter: {
+        oneOf: [
+            { required: ["cloudServiceConfiguration"] },
+            { required: ["virtualMachineConfiguration"] }
         ]
     }
-];
+};
 
 async function writeResourceSchemas() {
     await writeResourceSchema('job');
@@ -111,22 +116,10 @@ function fillInImplicitExtensionTypes(definitions: any) {
 }
 
 function enrichSchema(definitions: any) {
-    for (const group of eitherOrGroups) {
-        let declaringType = definitions[group.declaringType];
+    for (const e in enrichments) {
+        let declaringType = definitions[e];
         if (declaringType) {  // we run this after filtering to the job or pool subset, so some enrichments may not relate to the definitions at hand
-            let allowedSchemas : any[] = [];
-            for (const groupSpec of group.groups) {
-                let groupDefn : any = { properties: { }, required: declaringType.required || [] };
-                for (const p of groupSpec) {
-                    groupDefn.properties[p.name] = declaringType.properties[p.name];
-                    if (p.required) {
-                        groupDefn.required.push(p.name);
-                    }
-                }
-                allowedSchemas.push(groupDefn);            
-            }
-            declaringType.oneOf = allowedSchemas;
-            delete declaringType.properties;
+            declaringType = Object.assign(declaringType, enrichments[e]);
         }
     }
 }

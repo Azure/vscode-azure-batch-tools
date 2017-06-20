@@ -145,7 +145,19 @@
         "id",
         "vmSize"
       ],
-      "title": "A pool in the Azure Batch service to add."
+      "title": "A pool in the Azure Batch service to add.",
+      "oneOf": [
+        {
+          "required": [
+            "cloudServiceConfiguration"
+          ]
+        },
+        {
+          "required": [
+            "virtualMachineConfiguration"
+          ]
+        }
+      ]
     },
     "CloudServiceConfiguration": {
       "properties": {
