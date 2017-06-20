@@ -32,7 +32,7 @@ function looksLikeTemplate(json : any, resourceType : BatchResourceType) : boole
     return false;
 }
 
-function templateResourceType(resourceType : BatchResourceType) : string {
+export function templateResourceType(resourceType : BatchResourceType) : string {
     return "Microsoft.Batch/batchAccounts/" + plural(resourceType);
 }
 

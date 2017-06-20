@@ -67,12 +67,21 @@ const enrichments : any = {
 async function writeResourceSchemas() {
     await writeResourceSchema('job');
     await writeResourceSchema('pool');
+    await writeTemplateSchema('job');
+    await writeTemplateSchema('pool');
 }
 
 async function writeResourceSchema(resourceType : batch.BatchResourceType) : Promise<void> {
     const schema = await createResourceSchema(resourceType);
     const schemaText = JSON.stringify(schema, null, 2);
     const schemaFilePath = path.join(__dirname, `../../schema/${resourceType}.schema.json`);
+    fs.writeFileSync(schemaFilePath, schemaText);
+}
+
+async function writeTemplateSchema(resourceType: batch.BatchResourceType) : Promise<void> {
+    const schema = await createTemplateSchema(resourceType);
+    const schemaText = JSON.stringify(schema, null, 2);
+    const schemaFilePath = path.join(__dirname, `../../schema/${resourceType}template.schema.json`);
     fs.writeFileSync(schemaFilePath, schemaText);
 }
 
@@ -102,6 +111,85 @@ async function createResourceSchema(resourceType : batch.BatchResourceType) : Pr
     };
 
     return schema;
+}
+
+function templateSchemaTemplate(resourceType: batch.BatchResourceType) : any {
+    const pascalCased = resourceType[0].toUpperCase() + resourceType.substring(1);
+    return {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "title": `${resourceType}template`,
+        "description": `An Azure Batch ${resourceType} template`,
+        "type": "object",
+        "$ref": `#/definitions/${pascalCased}Template`,
+        "definitions": {
+            [`${pascalCased}Template`]: {
+                properties: {
+                    parameters: {
+                        type: "object",
+                        additionalProperties: {
+                            type: "object",
+                            "$ref": "#/definitions/BatchTemplateParameter"
+                        }
+                    },
+                    [resourceType]: {
+                        type: "object",
+                        "$ref": `#/definitions/${pascalCased}Template${pascalCased}`
+                    }
+                },
+                required: [resourceType],
+                title: "TBD"
+            },
+            BatchTemplateParameter: {
+                properties: {
+                    type: {
+                        type: "string"
+                    },  // TODO: defaultValue, allowedValues, etc.
+                    metadata: {
+                        type: "object",
+                        "$ref": "#/definitions/BatchTemplateParameterMetadata"
+                    }
+                },
+                required: ["type"]
+            },
+            BatchTemplateParameterMetadata: {
+                properties: {
+                    description: {
+                        type: "string"
+                    }
+                },
+                title: "TBD"
+            },
+            [`${pascalCased}Template${pascalCased}`]: {
+                properties: {
+                    type: {
+                        type: "string",
+                        title: "TBD"
+                        /* permitted values? */
+                    },
+                    apiVersion: {
+                        type: "string",
+                        title: "TBD"
+                        /* permitted values? */
+                    },
+                    properties: {
+                        type: "object",
+                        "$ref": `#/definitions/${pascalCased}AddParameter`,  // except any property can also be a string because substitution
+                        title: "TBD"
+                    }
+
+                },
+                required: [ "type", "apiVersion", "properties" ],
+                title: "TBD"
+            }
+        }
+    };
+}
+
+async function createTemplateSchema(resourceType: batch.BatchResourceType) : Promise<any> {
+    const resourceSchema = await createResourceSchema(resourceType);
+    let templateSchema : any = templateSchemaTemplate(resourceType);
+    Object.assign(templateSchema.definitions, resourceSchema.definitions);
+    return templateSchema;
 }
 
 function extendSchemaForBatchExtensions(definitions: any) : void {

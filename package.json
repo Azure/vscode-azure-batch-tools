@@ -116,6 +116,14 @@
       {
         "fileMatch": "*.pool.json",
         "url": "./schema/pool.schema.json"
+      },
+      {
+        "fileMatch": "*.jobtemplate.json",
+        "url": "./schema/jobtemplate.schema.json"
+      },
+      {
+        "fileMatch": "*.pooltemplate.json",
+        "url": "./schema/pooltemplate.schema.json"
       }
     ]
   },
