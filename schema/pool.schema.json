@@ -157,7 +157,15 @@
             "virtualMachineConfiguration"
           ]
         }
-      ]
+      ],
+      "dependencies": {
+        "autoScaleFormula": [
+          "enableAutoScale"
+        ],
+        "autoScaleEvaluationInterval": [
+          "enableAutoScale"
+        ]
+      }
     },
     "CloudServiceConfiguration": {
       "properties": {
@@ -208,7 +216,19 @@
       "required": [
         "nodeAgentSKUId"
       ],
-      "title": "The configuration for compute nodes in a pool based on the Azure Virtual Machines infrastructure."
+      "title": "The configuration for compute nodes in a pool based on the Azure Virtual Machines infrastructure.",
+      "oneOf": [
+        {
+          "required": [
+            "imageReference"
+          ]
+        },
+        {
+          "required": [
+            "osDisk"
+          ]
+        }
+      ]
     },
     "ImageReference": {
       "properties": {

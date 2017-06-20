@@ -38,6 +38,28 @@ const enrichments : any = {
         oneOf: [
             { required: ["cloudServiceConfiguration"] },
             { required: ["virtualMachineConfiguration"] }
+            // TODO: is there a nice way in JSON Schema to express independent oneOfs (specifically for targetDedicated and autoScaleFormula independently of the CSC/VMC alternate)
+        ],
+        dependencies: {
+            autoScaleFormula: ["enableAutoScale"],
+            autoScaleEvaluationInterval: ["enableAutoScale"]
+        }
+    },
+    PoolSpecification: {
+        oneOf: [
+            { required: ["cloudServiceConfiguration"] },
+            { required: ["virtualMachineConfiguration"] }
+            // TODO: is there a nice way in JSON Schema to express independent oneOfs (specifically for targetDedicated and autoScaleFormula independently of the CSC/VMC alternate)
+        ],
+        dependencies: {
+            autoScaleFormula: ["enableAutoScale"],
+            autoScaleEvaluationInterval: ["enableAutoScale"]
+        }
+    },
+    VirtualMachineConfiguration: {
+        oneOf: [
+            { required: ["imageReference"] },
+            { required: ["osDisk"] }
         ]
     }
 };

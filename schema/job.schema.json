@@ -751,7 +751,27 @@
       "required": [
         "vmSize"
       ],
-      "title": "Specification for creating a new pool."
+      "title": "Specification for creating a new pool.",
+      "oneOf": [
+        {
+          "required": [
+            "cloudServiceConfiguration"
+          ]
+        },
+        {
+          "required": [
+            "virtualMachineConfiguration"
+          ]
+        }
+      ],
+      "dependencies": {
+        "autoScaleFormula": [
+          "enableAutoScale"
+        ],
+        "autoScaleEvaluationInterval": [
+          "enableAutoScale"
+        ]
+      }
     },
     "CloudServiceConfiguration": {
       "properties": {
@@ -802,7 +822,19 @@
       "required": [
         "nodeAgentSKUId"
       ],
-      "title": "The configuration for compute nodes in a pool based on the Azure Virtual Machines infrastructure."
+      "title": "The configuration for compute nodes in a pool based on the Azure Virtual Machines infrastructure.",
+      "oneOf": [
+        {
+          "required": [
+            "imageReference"
+          ]
+        },
+        {
+          "required": [
+            "osDisk"
+          ]
+        }
+      ]
     },
     "ImageReference": {
       "properties": {
