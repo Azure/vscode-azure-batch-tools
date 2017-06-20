@@ -102,11 +102,11 @@ async function createResourceSchema(resourceType : batch.BatchResourceType) : Pr
     enrichSchema(schemaDefinitions);  // do this here to save us having to deal with oneOf etc. in the recursive addition process
 
     const schema : any = {
-        ["$schema"]: "http://json-schema.org/draft-04/schema#",
+        '$schema': 'http://json-schema.org/draft-04/schema#',
         title: resourceType,
         description: `An Azure Batch ${resourceType}`,
         type: 'object',
-        ['$ref']: `#/definitions/${bodySchema.name}`,
+        '$ref': `#/definitions/${bodySchema.name}`,
         definitions: schemaDefinitions
     };
 
@@ -116,12 +116,12 @@ async function createResourceSchema(resourceType : batch.BatchResourceType) : Pr
 function templateSchemaTemplate(resourceType: batch.BatchResourceType) : any {
     const pascalCased = resourceType[0].toUpperCase() + resourceType.substring(1);
     return {
-        "$schema": "http://json-schema.org/draft-04/schema#",
-        "title": `${resourceType}template`,
-        "description": `An Azure Batch ${resourceType} template`,
-        "type": "object",
-        "$ref": `#/definitions/${pascalCased}Template`,
-        "definitions": {
+        '$schema': 'http://json-schema.org/draft-04/schema#',
+        title: `${resourceType}template`,
+        description: `An Azure Batch ${resourceType} template`,
+        type: "object",
+        '$ref': `#/definitions/${pascalCased}Template`,
+        definitions: {
             [`${pascalCased}Template`]: {
                 properties: {
                     parameters: {
