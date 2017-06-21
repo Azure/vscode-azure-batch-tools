@@ -27,7 +27,28 @@
     "BatchTemplateParameter": {
       "properties": {
         "type": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "integer",
+            "string",
+            "boolean"
+          ]
+        },
+        "defaultValue": {},
+        "allowedValues": {
+          "type": "array"
+        },
+        "minValue": {
+          "type": "integer"
+        },
+        "maxValue": {
+          "type": "integer"
+        },
+        "minLength": {
+          "type": "integer"
+        },
+        "maxLength": {
+          "type": "integer"
         },
         "metadata": {
           "type": "object",
@@ -50,11 +71,17 @@
       "properties": {
         "type": {
           "type": "string",
-          "title": "TBD"
+          "title": "TBD",
+          "enum": [
+            "Microsoft.Batch/batchAccounts/pools"
+          ]
         },
         "apiVersion": {
           "type": "string",
-          "title": "TBD"
+          "title": "TBD",
+          "enum": [
+            "2017-05-01.5.0"
+          ]
         },
         "properties": {
           "type": "object",

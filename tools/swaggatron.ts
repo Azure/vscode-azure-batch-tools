@@ -129,8 +129,26 @@ function templateSchemaTemplate(resourceType: batch.BatchResourceType) : any {
             BatchTemplateParameter: {
                 properties: {
                     type: {
-                        type: "string"
-                    },  // TODO: defaultValue, allowedValues, etc.
+                        type: "string",
+                        enum: [ "integer", "string", "boolean" ]
+                    },
+                    defaultValue: {
+                    },
+                    allowedValues: {
+                        type: "array"
+                    },
+                    minValue: {
+                        type: "integer"
+                    },
+                    maxValue: {
+                        type: "integer"
+                    },
+                    minLength: {
+                        type: "integer"
+                    },
+                    maxLength: {
+                        type: "integer"
+                    },
                     metadata: {
                         type: "object",
                         "$ref": "#/definitions/BatchTemplateParameterMetadata"
@@ -150,13 +168,13 @@ function templateSchemaTemplate(resourceType: batch.BatchResourceType) : any {
                 properties: {
                     type: {
                         type: "string",
-                        title: "TBD"
-                        /* permitted values? */
+                        title: "TBD",
+                        enum: [templateResourceType(resourceType)]  // const not yet supported in VS Code
                     },
                     apiVersion: {
                         type: "string",
-                        title: "TBD"
-                        /* permitted values? */
+                        title: "TBD",
+                        enum: ["2017-05-01.5.0"]  // const not yet supported in VS Code
                     },
                     properties: {
                         type: "object",
@@ -275,6 +293,24 @@ function resourcePath(resourceType : batch.BatchResourceType) : string {
             throw 'Unknown resource type ' + resourceType;
     }
 }
+
+// We don't want to take a runtime dependency on batch.ts as it indirectly
+// imports the vscode module.  So we copy these two functions from there.
+// (We are allowed to take compile time dependencies on type definitions.)
+
+function templateResourceType(resourceType : batch.BatchResourceType) : string {
+    return "Microsoft.Batch/batchAccounts/" + plural(resourceType);
+}
+
+function plural(resourceType : batch.BatchResourceType) : string {
+    switch (resourceType) {
+        case 'job': return 'jobs';
+        case 'pool': return 'pools';
+        default: throw `unknown resource type ${resourceType}`;
+    }
+}
+
+// End of copy from the batch.ts module
 
 export async function fetchSwagger() : Promise<any> {
     const swaggerUrl = `https://raw.githubusercontent.com/Azure/azure-rest-api-specs/master/batch/2017-05-01.5.0/swagger/BatchService.json`;
