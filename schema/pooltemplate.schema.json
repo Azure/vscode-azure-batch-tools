@@ -29,9 +29,9 @@
         "type": {
           "type": "string",
           "enum": [
-            "integer",
+            "int",
             "string",
-            "boolean"
+            "bool"
           ]
         },
         "defaultValue": {},

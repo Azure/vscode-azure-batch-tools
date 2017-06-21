@@ -130,7 +130,7 @@ function templateSchemaTemplate(resourceType: batch.BatchResourceType) : any {
                 properties: {
                     type: {
                         type: "string",
-                        enum: [ "integer", "string", "boolean" ]
+                        enum: [ "int", "string", "bool" ]
                     },
                     defaultValue: {
                     },
