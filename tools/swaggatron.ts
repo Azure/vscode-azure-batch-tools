@@ -192,9 +192,28 @@ function templateSchemaTemplate(resourceType: batch.BatchResourceType) : any {
 
 async function createTemplateSchema(resourceType: batch.BatchResourceType) : Promise<any> {
     const resourceSchema = await createResourceSchema(resourceType);
+    addParameterSupport(resourceSchema.definitions);
     let templateSchema : any = templateSchemaTemplate(resourceType);
     Object.assign(templateSchema.definitions, resourceSchema.definitions);
     return templateSchema;
+}
+
+function addParameterSupport(definitions : any) : void {
+    // so the idea is we go through all the properties
+    // and change them all from type: X to anyOf: [ { type: X }, { type: string, pattern: param_regex } ]
+    for (let d in definitions) {
+        for (let pn in definitions[d].properties) {
+            let p = definitions[d].properties[pn];
+            const type = p.type;
+            if (type === "integer" || type === "boolean") {
+                p.anyOf = [
+                    { type: type },
+                    { type: "string", pattern: "\\[parameters\\('\\w+'\\)\\]" }
+                ];
+                delete p.type;
+            }
+        }
+    }
 }
 
 function extendSchemaForBatchExtensions(definitions: any) : void {

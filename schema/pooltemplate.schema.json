@@ -130,21 +130,45 @@
           "description": "The timeout for allocation of compute nodes to the pool."
         },
         "targetDedicatedNodes": {
-          "type": "integer",
           "format": "int32",
           "title": "The desired number of dedicated compute nodes in the pool.",
-          "description": "The desired number of dedicated compute nodes in the pool."
+          "description": "The desired number of dedicated compute nodes in the pool.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "targetLowPriorityNodes": {
-          "type": "integer",
           "format": "int32",
           "title": "The desired number of low-priority compute nodes in the pool.",
-          "description": "The desired number of low-priority compute nodes in the pool."
+          "description": "The desired number of low-priority compute nodes in the pool.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "enableAutoScale": {
-          "type": "boolean",
           "title": "Whether the pool size should automatically adjust over time.",
-          "description": "Whether the pool size should automatically adjust over time."
+          "description": "Whether the pool size should automatically adjust over time.",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "autoScaleFormula": {
           "type": "string",
@@ -158,9 +182,17 @@
           "description": "The time interval at which to automatically adjust the pool size according to the autoscale formula."
         },
         "enableInterNodeCommunication": {
-          "type": "boolean",
           "title": "Whether the pool permits direct communication between nodes.",
-          "description": "Whether the pool permits direct communication between nodes."
+          "description": "Whether the pool permits direct communication between nodes.",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "networkConfiguration": {
           "$ref": "#/definitions/NetworkConfiguration",
@@ -197,10 +229,18 @@
           "description": "The list of application licenses the Batch service will make available on each compute node in the pool."
         },
         "maxTasksPerNode": {
-          "type": "integer",
           "format": "int32",
           "title": "The maximum number of tasks that can run concurrently on a single compute node in the pool.",
-          "description": "The maximum number of tasks that can run concurrently on a single compute node in the pool."
+          "description": "The maximum number of tasks that can run concurrently on a single compute node in the pool.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "taskSchedulingPolicy": {
           "$ref": "#/definitions/TaskSchedulingPolicy",
@@ -384,9 +424,17 @@
     "WindowsConfiguration": {
       "properties": {
         "enableAutomaticUpdates": {
-          "type": "boolean",
           "title": "Whether automatic updates are enabled on the virtual machine.",
-          "description": "Whether automatic updates are enabled on the virtual machine."
+          "description": "Whether automatic updates are enabled on the virtual machine.",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         }
       },
       "title": "Windows operating system settings to apply to the virtual machine."
@@ -434,15 +482,31 @@
           "description": "The user identity under which the start task runs."
         },
         "maxTaskRetryCount": {
-          "type": "integer",
           "format": "int32",
           "title": "The maximum number of times the task may be retried.",
-          "description": "The maximum number of times the task may be retried."
+          "description": "The maximum number of times the task may be retried.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "waitForSuccess": {
-          "type": "boolean",
           "title": "Whether the Batch service should wait for the start task to complete successfully (that is, to exit with exit code 0) before scheduling any tasks on the compute node.",
-          "description": "Whether the Batch service should wait for the start task to complete successfully (that is, to exit with exit code 0) before scheduling any tasks on the compute node."
+          "description": "Whether the Batch service should wait for the start task to complete successfully (that is, to exit with exit code 0) before scheduling any tasks on the compute node.",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         }
       },
       "required": [
@@ -694,16 +758,32 @@
     "LinuxUserConfiguration": {
       "properties": {
         "uid": {
-          "type": "integer",
           "format": "int32",
           "title": "The user ID of the user account.",
-          "description": "The user ID of the user account."
+          "description": "The user ID of the user account.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "gid": {
-          "type": "integer",
           "format": "int32",
           "title": "The group ID for the user account.",
-          "description": "The group ID for the user account."
+          "description": "The group ID for the user account.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "sshPrivateKey": {
           "type": "string",
@@ -751,9 +831,17 @@
           "description": "TBD"
         },
         "allowEmptyChecksums": {
-          "type": "boolean",
           "title": "TBD",
-          "description": "TBD"
+          "description": "TBD",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "disableExcludes": {
           "type": "string",

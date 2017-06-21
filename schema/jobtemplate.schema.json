@@ -109,10 +109,18 @@
           "description": "The display name for the job."
         },
         "priority": {
-          "type": "integer",
           "format": "int32",
           "title": "The priority of the job.",
-          "description": "The priority of the job."
+          "description": "The priority of the job.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "constraints": {
           "$ref": "#/definitions/JobConstraints"
@@ -164,9 +172,17 @@
           "description": "A list of name-value pairs associated with the job as metadata."
         },
         "usesTaskDependencies": {
-          "type": "boolean",
           "title": "The flag that determines if this job will use tasks with dependencies.",
-          "description": "The flag that determines if this job will use tasks with dependencies."
+          "description": "The flag that determines if this job will use tasks with dependencies.",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "taskFactory": {
           "type": "object",
@@ -196,10 +212,18 @@
           "description": "The maximum elapsed time that the job may run, measured from the time the job is created."
         },
         "maxTaskRetryCount": {
-          "type": "integer",
           "format": "int32",
           "title": "The maximum number of times each task may be retried. The Batch service retries a task if its exit code is nonzero.",
-          "description": "The maximum number of times each task may be retried. The Batch service retries a task if its exit code is nonzero."
+          "description": "The maximum number of times each task may be retried. The Batch service retries a task if its exit code is nonzero.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         }
       },
       "title": "The execution constraints for a job."
@@ -251,9 +275,17 @@
           "description": "Constraints that apply to the Job Manager task."
         },
         "killJobOnCompletion": {
-          "type": "boolean",
           "title": "Whether completion of the Job Manager task signifies completion of the entire job.",
-          "description": "Whether completion of the Job Manager task signifies completion of the entire job."
+          "description": "Whether completion of the Job Manager task signifies completion of the entire job.",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "userIdentity": {
           "$ref": "#/definitions/UserIdentity",
@@ -261,9 +293,17 @@
           "description": "The user identity under which the Job Manager task runs."
         },
         "runExclusive": {
-          "type": "boolean",
           "title": "Whether the Job Manager task requires exclusive use of the compute node where it runs.",
-          "description": "Whether the Job Manager task requires exclusive use of the compute node where it runs."
+          "description": "Whether the Job Manager task requires exclusive use of the compute node where it runs.",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "applicationPackageReferences": {
           "type": "array",
@@ -279,9 +319,17 @@
           "$ref": "#/definitions/AuthenticationTokenSettings"
         },
         "allowLowPriorityNode": {
-          "type": "boolean",
           "title": "Whether the Job Manager task may run on a low-priority compute node.",
-          "description": "Whether the Job Manager task may run on a low-priority compute node."
+          "description": "Whether the Job Manager task may run on a low-priority compute node.",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         }
       },
       "required": [
@@ -450,10 +498,18 @@
           "description": "The minimum time to retain the task directory on the compute node where it ran, from the time it completes execution. After this time, the Batch service may delete the task directory and all its contents."
         },
         "maxTaskRetryCount": {
-          "type": "integer",
           "format": "int32",
           "title": "The maximum number of times the task may be retried. The Batch service retries a task if its exit code is nonzero.",
-          "description": "The maximum number of times the task may be retried. The Batch service retries a task if its exit code is nonzero."
+          "description": "The maximum number of times the task may be retried. The Batch service retries a task if its exit code is nonzero.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         }
       },
       "title": "Execution constraints to apply to a task."
@@ -584,9 +640,17 @@
           "description": "Constraints that apply to the Job Preparation task."
         },
         "waitForSuccess": {
-          "type": "boolean",
           "title": "Whether the Batch service should wait for the Job Preparation task to complete successfully before scheduling any other tasks of the job on the compute node.",
-          "description": "Whether the Batch service should wait for the Job Preparation task to complete successfully before scheduling any other tasks of the job on the compute node."
+          "description": "Whether the Batch service should wait for the Job Preparation task to complete successfully before scheduling any other tasks of the job on the compute node.",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "userIdentity": {
           "$ref": "#/definitions/UserIdentity",
@@ -594,9 +658,17 @@
           "description": "The user identity under which the Job Preparation task runs."
         },
         "rerunOnNodeRebootAfterSuccess": {
-          "type": "boolean",
           "title": "Whether the Batch service should rerun the Job Preparation task after a compute node reboots.",
-          "description": "Whether the Batch service should rerun the Job Preparation task after a compute node reboots."
+          "description": "Whether the Batch service should rerun the Job Preparation task after a compute node reboots.",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         }
       },
       "required": [
@@ -703,9 +775,17 @@
           }
         },
         "keepAlive": {
-          "type": "boolean",
           "title": "Whether to keep an auto pool alive after its lifetime expires.",
-          "description": "Whether to keep an auto pool alive after its lifetime expires."
+          "description": "Whether to keep an auto pool alive after its lifetime expires.",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "pool": {
           "$ref": "#/definitions/PoolSpecification",
@@ -741,10 +821,18 @@
           "description": "The virtual machine configuration for the pool."
         },
         "maxTasksPerNode": {
-          "type": "integer",
           "format": "int32",
           "title": "The maximum number of tasks that can run concurrently on a single compute node in the pool.",
-          "description": "The maximum number of tasks that can run concurrently on a single compute node in the pool."
+          "description": "The maximum number of tasks that can run concurrently on a single compute node in the pool.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "taskSchedulingPolicy": {
           "$ref": "#/definitions/TaskSchedulingPolicy"
@@ -756,21 +844,45 @@
           "description": "The timeout for allocation of compute nodes to the pool."
         },
         "targetDedicatedNodes": {
-          "type": "integer",
           "format": "int32",
           "title": "The desired number of dedicated compute nodes in the pool.",
-          "description": "The desired number of dedicated compute nodes in the pool."
+          "description": "The desired number of dedicated compute nodes in the pool.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "targetLowPriorityNodes": {
-          "type": "integer",
           "format": "int32",
           "title": "The desired number of low-priority compute nodes in the pool.",
-          "description": "The desired number of low-priority compute nodes in the pool."
+          "description": "The desired number of low-priority compute nodes in the pool.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "enableAutoScale": {
-          "type": "boolean",
           "title": "Whether the pool size should automatically adjust over time.",
-          "description": "Whether the pool size should automatically adjust over time."
+          "description": "Whether the pool size should automatically adjust over time.",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "autoScaleFormula": {
           "type": "string",
@@ -784,9 +896,17 @@
           "description": "The time interval at which to automatically adjust the pool size according to the autoscale formula."
         },
         "enableInterNodeCommunication": {
-          "type": "boolean",
           "title": "Whether the pool permits direct communication between nodes.",
-          "description": "Whether the pool permits direct communication between nodes."
+          "description": "Whether the pool permits direct communication between nodes.",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "networkConfiguration": {
           "$ref": "#/definitions/NetworkConfiguration",
@@ -990,9 +1110,17 @@
     "WindowsConfiguration": {
       "properties": {
         "enableAutomaticUpdates": {
-          "type": "boolean",
           "title": "Whether automatic updates are enabled on the virtual machine.",
-          "description": "Whether automatic updates are enabled on the virtual machine."
+          "description": "Whether automatic updates are enabled on the virtual machine.",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         }
       },
       "title": "Windows operating system settings to apply to the virtual machine."
@@ -1061,15 +1189,31 @@
           "description": "The user identity under which the start task runs."
         },
         "maxTaskRetryCount": {
-          "type": "integer",
           "format": "int32",
           "title": "The maximum number of times the task may be retried.",
-          "description": "The maximum number of times the task may be retried."
+          "description": "The maximum number of times the task may be retried.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "waitForSuccess": {
-          "type": "boolean",
           "title": "Whether the Batch service should wait for the start task to complete successfully (that is, to exit with exit code 0) before scheduling any tasks on the compute node.",
-          "description": "Whether the Batch service should wait for the start task to complete successfully (that is, to exit with exit code 0) before scheduling any tasks on the compute node."
+          "description": "Whether the Batch service should wait for the start task to complete successfully (that is, to exit with exit code 0) before scheduling any tasks on the compute node.",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         }
       },
       "required": [
@@ -1164,16 +1308,32 @@
     "LinuxUserConfiguration": {
       "properties": {
         "uid": {
-          "type": "integer",
           "format": "int32",
           "title": "The user ID of the user account.",
-          "description": "The user ID of the user account."
+          "description": "The user ID of the user account.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "gid": {
-          "type": "integer",
           "format": "int32",
           "title": "The group ID for the user account.",
-          "description": "The group ID for the user account."
+          "description": "The group ID for the user account.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "sshPrivateKey": {
           "type": "string",
@@ -1402,10 +1562,18 @@
     "ExitCodeMapping": {
       "properties": {
         "code": {
-          "type": "integer",
           "format": "int32",
           "title": "A process exit code.",
-          "description": "A process exit code."
+          "description": "A process exit code.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "exitOptions": {
           "$ref": "#/definitions/ExitOptions",
@@ -1454,16 +1622,32 @@
     "ExitCodeRangeMapping": {
       "properties": {
         "start": {
-          "type": "integer",
           "format": "int32",
           "title": "The first exit code in the range.",
-          "description": "The first exit code in the range."
+          "description": "The first exit code in the range.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "end": {
-          "type": "integer",
           "format": "int32",
           "title": "The last exit code in the range.",
-          "description": "The last exit code in the range."
+          "description": "The last exit code in the range.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "exitOptions": {
           "$ref": "#/definitions/ExitOptions",
@@ -1494,10 +1678,18 @@
     "MultiInstanceSettings": {
       "properties": {
         "numberOfInstances": {
-          "type": "integer",
           "format": "int32",
           "title": "The number of compute nodes required by the task.",
-          "description": "The number of compute nodes required by the task."
+          "description": "The number of compute nodes required by the task.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "coordinationCommandLine": {
           "type": "string",
@@ -1543,16 +1735,32 @@
     "TaskIdRange": {
       "properties": {
         "start": {
-          "type": "integer",
           "format": "int32",
           "title": "The first task ID in the range.",
-          "description": "The first task ID in the range."
+          "description": "The first task ID in the range.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "end": {
-          "type": "integer",
           "format": "int32",
           "title": "The last task ID in the range.",
-          "description": "The last task ID in the range."
+          "description": "The last task ID in the range.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         }
       },
       "title": "A range of task IDs that a task can depend on. All tasks with IDs in the range must complete successfully before the dependent task can be scheduled.",
@@ -1580,9 +1788,17 @@
           "description": "TBD"
         },
         "allowEmptyChecksums": {
-          "type": "boolean",
           "title": "TBD",
-          "description": "TBD"
+          "description": "TBD",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "disableExcludes": {
           "type": "string",
@@ -1598,19 +1814,43 @@
     "ParametricSweepParameterSet": {
       "properties": {
         "start": {
-          "type": "integer",
           "title": "TBD",
-          "description": "TBD"
+          "description": "TBD",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "end": {
-          "type": "integer",
           "title": "TBD",
-          "description": "TBD"
+          "description": "TBD",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         },
         "step": {
-          "type": "integer",
           "title": "TBD",
-          "description": "TBD"
+          "description": "TBD",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "\\[parameters\\('\\w+'\\)\\]"
+            }
+          ]
         }
       },
       "required": [
