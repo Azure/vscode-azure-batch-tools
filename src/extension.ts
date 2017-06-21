@@ -76,6 +76,14 @@ function createPool() {
 
 async function createResourceImpl(doc : vscode.TextDocument, resourceType : batch.BatchResourceType) {
 
+    // https://github.com/Microsoft/vscode/issues/29156
+    // We don't yet have a workaround for this, so for now, resort to asking the user to
+    // save the document and then re-run the command.  No, it's not great.  Sorry.
+    if (doc.isUntitled) {
+        await vscode.window.showWarningMessage("Please save the document before running this command.");
+        return;
+    }
+
     const templateInfo = batch.parseBatchTemplate(doc.getText(), resourceType);
     if (!templateInfo.isTemplate) {
         await vscode.window.showErrorMessage(templateInfo.templateValidationFailure);
