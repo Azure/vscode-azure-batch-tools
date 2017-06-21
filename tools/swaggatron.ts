@@ -77,7 +77,7 @@ async function createResourceSchema(resourceType : batch.BatchResourceType) : Pr
     const swagger = await fetchSwagger();
     extendSchemaForBatchExtensions(swagger.definitions);
     const addResourceOperation = swagger.paths[resourcePath(resourceType)].post;
-    const addResourceBodySchemaRef : string = addResourceOperation.parameters[0 /* <- TODO: !!! */].schema['$ref'];
+    const addResourceBodySchemaRef : string = addResourceOperation.parameters.find((p: any) => p.in === 'body').schema['$ref'];
 
     const bodySchema = chaseRef(swagger, addResourceBodySchemaRef);
 
