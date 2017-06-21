@@ -384,8 +384,8 @@ function findProperty(symbols: vscode.SymbolInformation[], position: vscode.Posi
 }
 
 function getParameterTypeName(value : any) : string {
-    return (value instanceof Number || typeof value === 'number') ? 'integer' :
-        (value instanceof Boolean || typeof value === 'boolean') ? 'boolean' :
+    return (value instanceof Number || typeof value === 'number') ? 'int' :
+        (value instanceof Boolean || typeof value === 'boolean') ? 'bool' :
         (value instanceof String || typeof value === 'string') ? 'string' :
         'object';
 }
