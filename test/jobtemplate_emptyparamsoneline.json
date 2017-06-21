@@ -1,0 +1,13 @@
+{
+  "parameters": { },
+  "job": {
+    "type": "Microsoft.Batch/batchAccounts/jobs",
+    "apiVersion": "2016-12-01",
+    "properties": {
+      "id" : "wonderjob",
+      "poolInfo" : {
+          "poolId" : "wonderpool"
+      }
+    }
+  }
+}

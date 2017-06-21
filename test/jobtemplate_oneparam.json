@@ -1,0 +1,20 @@
+{
+  "parameters": {
+    "jobid" : {
+      "type" : "string",
+      "metadata" : {
+        "description" : "A unique identifier for the job"
+      }
+    }
+  },
+  "job": {
+    "type": "Microsoft.Batch/batchAccounts/jobs",
+    "apiVersion": "2016-12-01",
+    "properties": {
+      "id" : "[parameters('jobid')]",
+      "poolInfo" : {
+          "poolId" : "wonderpool"
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+    "Azure Batch Template": {
+        "prefix": "batch.template",
+        "body": [
+            "{",
+            "\t\"parameters\": {$0",
+            "\t},",
+            "\t\"${1:job}\": {",
+            "\t\t\"type\": \"Microsoft.Batch/batchAccounts/${1:job}s\",",
+            "\t\t\"apiVersion\": \"2017-05-01\",",
+            "\t\t\"properties\": {",
+            "\t\t\t\"id\": \"${2:id}\"",
+            "\t\t}",
+            "\t},",
+            "}"
+        ],
+        "description": "An Azure Batch resource template"
+    },
+    "Azure Batch Template Parameter": {
+        "prefix": "batch.parameter-declaration",
+        "body": [
+            "\"${1:name}\": {",
+            "\t\"type\": \"${2:string}\",",
+            "\t\"metadata\": {",
+            "\t\t\"description\": \"$3\"",
+            "\t}",
+            "}"
+        ],
+        "description": "Declares a parameter for an Azure Batch template"
+    }
+}

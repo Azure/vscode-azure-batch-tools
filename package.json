@@ -1,0 +1,132 @@
+{
+  "name": "vscode-azure-batch-tools",
+  "displayName": "Azure Batch Tools for Visual Studio Code",
+  "description": "Commands for authoring and deploying Azure Batch resources",
+  "version": "0.0.1",
+  "publisher": "itowlson",
+  "engines": {
+    "vscode": "^1.13.0"
+  },
+ "repository": {
+    "type": "git",
+    "url": "https://github.com/Azure/vscode-azure-batch-tools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Azure/vscode-azure-batch-tools/issues"
+  },
+  "keywords": [
+    "azure",
+    "batch",
+    "cloud"
+  ],
+  "activationEvents": [
+    "onCommand:azure.batch.createJob",
+    "onCommand:azure.batch.createPool",
+    "onCommand:azure.batch.createTemplateFromJob",
+    "onCommand:azure.batch.createTemplateFromPool",
+    "onCommand:azure.batch.convertToParameter",
+    "onView:azure.batch.explorer",
+    "onLanguage:json"
+  ],
+  "main": "./out/src/extension",
+  "contributes": {
+    "commands": [
+      {
+        "command": "azure.batch.createJob",
+        "title": "Create Batch Job",
+        "category": "Azure"
+      },
+      {
+        "command": "azure.batch.createPool",
+        "title": "Create Batch Pool",
+        "category": "Azure"
+      },
+      {
+        "command": "azure.batch.createTemplateFromJob",
+        "title": "Create Batch Template from Job",
+        "category": "Azure"
+      },
+      {
+        "command": "azure.batch.createTemplateFromPool",
+        "title": "Create Batch Template from Pool",
+        "category": "Azure"
+      },
+      {
+        "command": "azure.batch.convertToParameter",
+        "title": "Convert to Batch Template Parameter",
+        "category": "Azure"
+      },
+			{
+				"command": "azure.batch.get",
+				"title": "Get"
+			},
+			{
+				"command": "azure.batch.getAsTemplate",
+				"title": "Get as Template"
+			},
+			{
+				"command": "azure.batch.refresh",
+				"title": "Refresh"
+			}
+    ],
+    "snippets": [
+      {
+        "language": "json",
+        "path": "./snippet/job.json"
+      },
+      {
+        "language": "json",
+        "path": "./snippet/template.json"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "azure.batch.explorer",
+          "name": "Azure Batch"
+        }
+      ]
+    },
+    "menus":{
+      "view/title" : [
+        {
+          "command" : "azure.batch.refresh",
+          "when": "view == azure.batch.explorer",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "azure.batch.get",
+          "when": "view == azure.batch.explorer && viewItem == azure.batch.resource"
+        },
+        {
+          "command": "azure.batch.getAsTemplate",
+          "when": "view == azure.batch.explorer && viewItem == azure.batch.resource"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "tsc -p ./",
+    "compile": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "node ./node_modules/vscode/bin/test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^2.2.32",
+    "@types/node": "^6.0.40",
+    "@types/shelljs": "^0.7.1",
+    "@types/tmp": "0.0.33",
+    "@types/moment-duration-format": "^1.3.5",
+    "mocha": "^2.3.3",
+    "typescript": "^2.0.3",
+    "vscode": "^1.0.0"
+  },
+  "dependencies": {
+    "shelljs": "^0.7.7",
+    "tmp": "^0.0.31",
+    "moment": "^2.15.2",
+    "moment-duration-format": "^1.3.0"
+  }
+}

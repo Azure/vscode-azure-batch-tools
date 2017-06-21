@@ -1,0 +1,26 @@
+{
+  "parameters": {
+    "abc" : {
+      "type" : "string",
+      "metadata" : {
+        "description" : "A sequence near the end of the alphabet"
+      }
+    },
+    "xyz" : {
+      "type" : "string",
+      "metadata" : {
+        "description" : "A sequence near the end of the alphabet"
+      }
+    }
+  },
+  "job": {
+    "type": "Microsoft.Batch/batchAccounts/jobs",
+    "apiVersion": "2016-12-01",
+    "properties": {
+      "id" : "[parameters('abc')]",
+      "poolInfo" : {
+          "poolId" : "wonderpool"
+      }
+    }
+  }
+}
