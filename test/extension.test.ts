@@ -12,7 +12,6 @@ import * as vscode from 'vscode';
 import * as batch from '../src/batch';
 import * as duration from '../src/duration';
 import * as extension from '../src/extension';
-import * as s from '../tools/swaggatron';
 import * as path from 'path';
 import * as fs from 'fs';
 
