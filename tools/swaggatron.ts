@@ -14,6 +14,9 @@ const implicitExtensionTypes = [
     }
 ];
 
+// Additional JSON Schema elements to be merged with the specified definitions -
+// refer to JSON Schema documentation for semantics.  These capture information which
+// is only in documentation in the Swagger spec.
 const enrichments : any = {
     PoolInformation: {
         oneOf: [
@@ -30,6 +33,7 @@ const enrichments : any = {
         dependencies: {
             autoScaleFormula: ["enableAutoScale"],
             autoScaleEvaluationInterval: ["enableAutoScale"]
+            // TODO: would like to express e.g. "ASF depends on EAS being present **and true**" - JSON Schema may be able to do this but the VS Code validator doesn't seem to handle it yet
         }
     },
     PoolSpecification: {
@@ -100,6 +104,10 @@ async function createResourceSchema(resourceType : batch.BatchResourceType) : Pr
     return schema;
 }
 
+// NOTE: VS Code JSON validation has a bug where it shows description rather than title
+// in intellisense. We could write the template schema template to return descriptions,
+// but in order to keep it 'correct' we return titles and fix them up in the same way
+// as we fix up the definitions that we source from Swagger.
 function templateSchemaTemplate(resourceType: batch.BatchResourceType) : any {
     const pascalCased = resourceType[0].toUpperCase() + resourceType.substring(1);
     return {
@@ -116,42 +124,52 @@ function templateSchemaTemplate(resourceType: batch.BatchResourceType) : any {
                         additionalProperties: {
                             type: "object",
                             "$ref": "#/definitions/BatchTemplateParameter"
-                        }
+                        },
+                        title: "The parameters whose values may be supplied each time the template is used."
                     },
                     [resourceType]: {
                         type: "object",
-                        "$ref": `#/definitions/${pascalCased}Template${pascalCased}`
+                        "$ref": `#/definitions/${pascalCased}Template${pascalCased}`,
+                        title: `The resource to be created from the template.`
                     }
                 },
                 required: [resourceType],
-                title: "TBD"
+                title: `An Azure Batch ${resourceType} template.`
             },
             BatchTemplateParameter: {
                 properties: {
                     type: {
                         type: "string",
-                        enum: [ "int", "string", "bool" ]
+                        enum: [ "int", "string", "bool" ],
+                        title: "The data type of the parameter."
                     },
                     defaultValue: {
+                        title: "The default value of the parameter."
                     },
                     allowedValues: {
-                        type: "array"
+                        type: "array",
+                        title: "The allowed values of the parameter."
                     },
                     minValue: {
-                        type: "integer"
+                        type: "integer",
+                        title: "The minimum value of the parameter."
                     },
                     maxValue: {
-                        type: "integer"
+                        type: "integer",
+                        title: "The maximum value of the parameter."
                     },
                     minLength: {
-                        type: "integer"
+                        type: "integer",
+                        title: "The minimum length of the parameter value."
                     },
                     maxLength: {
-                        type: "integer"
+                        type: "integer",
+                        title: "The maximum length of the parameter value."
                     },
                     metadata: {
                         type: "object",
-                        "$ref": "#/definitions/BatchTemplateParameterMetadata"
+                        "$ref": "#/definitions/BatchTemplateParameterMetadata",
+                        title: "Additional data about the parameter."
                     }
                 },
                 required: ["type"]
@@ -159,32 +177,32 @@ function templateSchemaTemplate(resourceType: batch.BatchResourceType) : any {
             BatchTemplateParameterMetadata: {
                 properties: {
                     description: {
-                        type: "string"
+                        type: "string",
+                        title: "A description of the parameter, suitable for display in a user interface."
                     }
                 },
-                title: "TBD"
+                title: "Additional data about an Azure Batch template parameter."
             },
             [`${pascalCased}Template${pascalCased}`]: {
                 properties: {
                     type: {
                         type: "string",
-                        title: "TBD",
+                        title: `The type of Azure Batch resource to create. Must be '${templateResourceType(resourceType)}'.`,
                         enum: [templateResourceType(resourceType)]  // const not yet supported in VS Code
                     },
                     apiVersion: {
                         type: "string",
-                        title: "TBD",
+                        title: "The Azure Batch API version against which the template is written. Must be '2017-05-01.5.0'.",
                         enum: ["2017-05-01.5.0"]  // const not yet supported in VS Code
                     },
                     properties: {
                         type: "object",
-                        "$ref": `#/definitions/${pascalCased}AddParameter`,  // except any property can also be a string because substitution
-                        title: "TBD"
+                        "$ref": `#/definitions/${pascalCased}AddParameter`,  // except any property can also be a string because substitution - handled by the addParameterSupport transformation
+                        title: `The ${resourceType} to be created from the template.`
                     }
-
                 },
                 required: [ "type", "apiVersion", "properties" ],
-                title: "TBD"
+                title: "The resource to be created from an Azure Batch template."
             }
         }
     };
@@ -194,6 +212,9 @@ async function createTemplateSchema(resourceType: batch.BatchResourceType) : Pro
     const resourceSchema = await createResourceSchema(resourceType);
     addParameterSupport(resourceSchema.definitions);
     let templateSchema : any = templateSchemaTemplate(resourceType);
+    for (const p in templateSchema.definitions) {  // Rather than compromise our template schema to deal with the VS Code title bug, we fix it up here
+        fixSchemaSoTitlesShowInJsonValidation(templateSchema.definitions[p]);
+    }
     Object.assign(templateSchema.definitions, resourceSchema.definitions);
     return templateSchema;
 }

@@ -137,8 +137,8 @@
           "items": {
             "$ref": "#/definitions/PackageReference"
           },
-          "title": "Biscotti!",
-          "description": "Biscotti!"
+          "title": "A collection of packages to be added from external package managers to each node in the pool.",
+          "description": "A collection of packages to be added from external package managers to each node in the pool."
         }
       },
       "required": [
@@ -379,8 +379,8 @@
         "source": {
           "type": "object",
           "$ref": "#/definitions/ResourceFileSource",
-          "title": "TBD.",
-          "description": "TBD."
+          "title": "A source for files to be downloaded before running the task command line.",
+          "description": "A source for files to be downloaded before running the task command line."
         }
       },
       "required": [
@@ -393,13 +393,13 @@
       "properties": {
         "fileGroup": {
           "type": "string",
-          "title": "TBD",
-          "description": "TBD"
+          "title": "The file group in the linked storage account from which to download files.",
+          "description": "The file group in the linked storage account from which to download files."
         },
         "prefix": {
           "type": "string",
-          "title": "TBD",
-          "description": "TBD"
+          "title": "A prefix with which to filter the files to download.",
+          "description": "A prefix with which to filter the files to download."
         }
       },
       "required": [
@@ -651,23 +651,23 @@
         },
         "id": {
           "type": "string",
-          "title": "TBD",
-          "description": "TBD"
+          "title": "The name or ID of the package to be installed as identified according to the package repository.",
+          "description": "The name or ID of the package to be installed as identified according to the package repository."
         },
         "version": {
           "type": "string",
-          "title": "TBD",
-          "description": "TBD"
+          "title": "The version of the package to be installed.",
+          "description": "The version of the package to be installed."
         },
         "allowEmptyChecksums": {
           "type": "boolean",
-          "title": "TBD",
-          "description": "TBD"
+          "title": "Whether Chocolatey will install packages without a checksum for validation.",
+          "description": "Whether Chocolatey will install packages without a checksum for validation."
         },
         "disableExcludes": {
           "type": "string",
-          "title": "TBD",
-          "description": "TBD"
+          "title": "Packages that might otherwise be excluded by VM configuration (e.g. kernel packages).",
+          "description": "Packages that might otherwise be excluded by VM configuration (e.g. kernel packages)."
         }
       },
       "required": [

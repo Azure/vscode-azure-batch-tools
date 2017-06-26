@@ -12,17 +12,21 @@
           "additionalProperties": {
             "type": "object",
             "$ref": "#/definitions/BatchTemplateParameter"
-          }
+          },
+          "title": "The parameters whose values may be supplied each time the template is used.",
+          "description": "The parameters whose values may be supplied each time the template is used."
         },
         "job": {
           "type": "object",
-          "$ref": "#/definitions/JobTemplateJob"
+          "$ref": "#/definitions/JobTemplateJob",
+          "title": "The resource to be created from the template.",
+          "description": "The resource to be created from the template."
         }
       },
       "required": [
         "job"
       ],
-      "title": "TBD"
+      "title": "An Azure Batch job template."
     },
     "BatchTemplateParameter": {
       "properties": {
@@ -32,27 +36,44 @@
             "int",
             "string",
             "bool"
-          ]
+          ],
+          "title": "The data type of the parameter.",
+          "description": "The data type of the parameter."
         },
-        "defaultValue": {},
+        "defaultValue": {
+          "title": "The default value of the parameter.",
+          "description": "The default value of the parameter."
+        },
         "allowedValues": {
-          "type": "array"
+          "type": "array",
+          "title": "The allowed values of the parameter.",
+          "description": "The allowed values of the parameter."
         },
         "minValue": {
-          "type": "integer"
+          "type": "integer",
+          "title": "The minimum value of the parameter.",
+          "description": "The minimum value of the parameter."
         },
         "maxValue": {
-          "type": "integer"
+          "type": "integer",
+          "title": "The maximum value of the parameter.",
+          "description": "The maximum value of the parameter."
         },
         "minLength": {
-          "type": "integer"
+          "type": "integer",
+          "title": "The minimum length of the parameter value.",
+          "description": "The minimum length of the parameter value."
         },
         "maxLength": {
-          "type": "integer"
+          "type": "integer",
+          "title": "The maximum length of the parameter value.",
+          "description": "The maximum length of the parameter value."
         },
         "metadata": {
           "type": "object",
-          "$ref": "#/definitions/BatchTemplateParameterMetadata"
+          "$ref": "#/definitions/BatchTemplateParameterMetadata",
+          "title": "Additional data about the parameter.",
+          "description": "Additional data about the parameter."
         }
       },
       "required": [
@@ -62,31 +83,36 @@
     "BatchTemplateParameterMetadata": {
       "properties": {
         "description": {
-          "type": "string"
+          "type": "string",
+          "title": "A description of the parameter, suitable for display in a user interface.",
+          "description": "A description of the parameter, suitable for display in a user interface."
         }
       },
-      "title": "TBD"
+      "title": "Additional data about an Azure Batch template parameter."
     },
     "JobTemplateJob": {
       "properties": {
         "type": {
           "type": "string",
-          "title": "TBD",
+          "title": "The type of Azure Batch resource to create. Must be 'Microsoft.Batch/batchAccounts/jobs'.",
           "enum": [
             "Microsoft.Batch/batchAccounts/jobs"
-          ]
+          ],
+          "description": "The type of Azure Batch resource to create. Must be 'Microsoft.Batch/batchAccounts/jobs'."
         },
         "apiVersion": {
           "type": "string",
-          "title": "TBD",
+          "title": "The Azure Batch API version against which the template is written. Must be '2017-05-01.5.0'.",
           "enum": [
             "2017-05-01.5.0"
-          ]
+          ],
+          "description": "The Azure Batch API version against which the template is written. Must be '2017-05-01.5.0'."
         },
         "properties": {
           "type": "object",
           "$ref": "#/definitions/JobAddParameter",
-          "title": "TBD"
+          "title": "The job to be created from the template.",
+          "description": "The job to be created from the template."
         }
       },
       "required": [
@@ -94,7 +120,7 @@
         "apiVersion",
         "properties"
       ],
-      "title": "TBD"
+      "title": "The resource to be created from an Azure Batch template."
     },
     "JobAddParameter": {
       "properties": {
@@ -186,15 +212,15 @@
         },
         "taskFactory": {
           "type": "object",
-          "title": "Biscotti!",
+          "title": "A specification for the tasks to be added to the job.",
           "$ref": "#/definitions/TaskFactory",
-          "description": "Biscotti!"
+          "description": "A specification for the tasks to be added to the job."
         },
         "applicationTemplateInfo": {
           "type": "object",
-          "title": "Biscotti!",
+          "title": "An application template from which to create the job.",
           "$ref": "#/definitions/ApplicationTemplateInfo",
-          "description": "Biscotti!"
+          "description": "An application template from which to create the job."
         }
       },
       "required": [
@@ -358,8 +384,8 @@
         "source": {
           "type": "object",
           "$ref": "#/definitions/ResourceFileSource",
-          "title": "TBD.",
-          "description": "TBD."
+          "title": "A source for files to be downloaded before running the task command line.",
+          "description": "A source for files to be downloaded before running the task command line."
         }
       },
       "required": [
@@ -372,13 +398,13 @@
       "properties": {
         "fileGroup": {
           "type": "string",
-          "title": "TBD",
-          "description": "TBD"
+          "title": "The file group in the linked storage account from which to download files.",
+          "description": "The file group in the linked storage account from which to download files."
         },
         "prefix": {
           "type": "string",
-          "title": "TBD",
-          "description": "TBD"
+          "title": "A prefix with which to filter the files to download.",
+          "description": "A prefix with which to filter the files to download."
         }
       },
       "required": [
@@ -1409,8 +1435,8 @@
           "items": {
             "$ref": "#/definitions/ParametricSweepParameterSet"
           },
-          "title": "TBD",
-          "description": "TBD"
+          "title": "The parameter or parameters whose values will be varied over the parametric sweep.",
+          "description": "The parameter or parameters whose values will be varied over the parametric sweep."
         },
         "repeatTask": {
           "type": "object",
@@ -1421,8 +1447,8 @@
         "source": {
           "type": "object",
           "$ref": "#/definitions/TaskPerFileSource",
-          "title": "TBD.",
-          "description": "TBD."
+          "title": "The source of the files for which to create tasks.",
+          "description": "The source of the files for which to create tasks."
         }
       }
     },
@@ -1513,8 +1539,8 @@
           "items": {
             "$ref": "#/definitions/PackageReference"
           },
-          "title": "Biscotti!",
-          "description": "Biscotti!"
+          "title": "A collection of packages from external package managers to be added to the node where the task runs.",
+          "description": "A collection of packages from external package managers to be added to the node where the task runs."
         }
       },
       "required": [
@@ -1779,17 +1805,17 @@
         },
         "id": {
           "type": "string",
-          "title": "TBD",
-          "description": "TBD"
+          "title": "The name or ID of the package to be installed as identified according to the package repository.",
+          "description": "The name or ID of the package to be installed as identified according to the package repository."
         },
         "version": {
           "type": "string",
-          "title": "TBD",
-          "description": "TBD"
+          "title": "The version of the package to be installed.",
+          "description": "The version of the package to be installed."
         },
         "allowEmptyChecksums": {
-          "title": "TBD",
-          "description": "TBD",
+          "title": "Whether Chocolatey will install packages without a checksum for validation.",
+          "description": "Whether Chocolatey will install packages without a checksum for validation.",
           "anyOf": [
             {
               "type": "boolean"
@@ -1802,8 +1828,8 @@
         },
         "disableExcludes": {
           "type": "string",
-          "title": "TBD",
-          "description": "TBD"
+          "title": "Packages that might otherwise be excluded by VM configuration (e.g. kernel packages).",
+          "description": "Packages that might otherwise be excluded by VM configuration (e.g. kernel packages)."
         }
       },
       "required": [
@@ -1814,8 +1840,8 @@
     "ParametricSweepParameterSet": {
       "properties": {
         "start": {
-          "title": "TBD",
-          "description": "TBD",
+          "title": "The start of the parametric sweep range.",
+          "description": "The start of the parametric sweep range.",
           "anyOf": [
             {
               "type": "integer"
@@ -1827,8 +1853,8 @@
           ]
         },
         "end": {
-          "title": "TBD",
-          "description": "TBD",
+          "title": "The end of the parametric sweep range.",
+          "description": "The end of the parametric sweep range.",
           "anyOf": [
             {
               "type": "integer"
@@ -1840,8 +1866,8 @@
           ]
         },
         "step": {
-          "title": "TBD",
-          "description": "TBD",
+          "title": "The increment step between values of the parameter.",
+          "description": "The increment step between values of the parameter.",
           "anyOf": [
             {
               "type": "integer"
@@ -1935,8 +1961,8 @@
           "items": {
             "$ref": "#/definitions/PackageReference"
           },
-          "title": "Biscotti!",
-          "description": "Biscotti!"
+          "title": "A collection of packages from external package managers to be added to the node where the task runs.",
+          "description": "A collection of packages from external package managers to be added to the node where the task runs."
         }
       },
       "title": "An Azure Batch task to add.",
@@ -1948,18 +1974,18 @@
       "properties": {
         "fileGroup": {
           "type": "string",
-          "title": "TBD",
-          "description": "TBD"
+          "title": "The file group in the linked storage account from which to take files.",
+          "description": "The file group in the linked storage account from which to take files."
         },
         "containerUrl": {
           "type": "string",
-          "title": "TBD",
-          "description": "TBD"
+          "title": "The URL of an Azure Storage blob container from which to take files, including any required Shared Access Signature (SAS).",
+          "description": "The URL of an Azure Storage blob container from which to take files, including any required Shared Access Signature (SAS)."
         },
         "prefix": {
           "type": "string",
-          "title": "TBD",
-          "description": "TBD"
+          "title": "A prefix with which to filter the files from which to create tasks.",
+          "description": "A prefix with which to filter the files from which to create tasks."
         }
       }
     },
@@ -1967,13 +1993,13 @@
       "properties": {
         "filePath": {
           "type": "string",
-          "title": "TBD",
-          "description": "TBD"
+          "title": "The path to the application template file.",
+          "description": "The path to the application template file."
         },
         "parameters": {
           "type": "object",
-          "title": "TBD",
-          "description": "TBD"
+          "title": "The values to assign to the application template parameters.",
+          "description": "The values to assign to the application template parameters."
         }
       }
     }

@@ -12,17 +12,21 @@
           "additionalProperties": {
             "type": "object",
             "$ref": "#/definitions/BatchTemplateParameter"
-          }
+          },
+          "title": "The parameters whose values may be supplied each time the template is used.",
+          "description": "The parameters whose values may be supplied each time the template is used."
         },
         "pool": {
           "type": "object",
-          "$ref": "#/definitions/PoolTemplatePool"
+          "$ref": "#/definitions/PoolTemplatePool",
+          "title": "The resource to be created from the template.",
+          "description": "The resource to be created from the template."
         }
       },
       "required": [
         "pool"
       ],
-      "title": "TBD"
+      "title": "An Azure Batch pool template."
     },
     "BatchTemplateParameter": {
       "properties": {
@@ -32,27 +36,44 @@
             "int",
             "string",
             "bool"
-          ]
+          ],
+          "title": "The data type of the parameter.",
+          "description": "The data type of the parameter."
         },
-        "defaultValue": {},
+        "defaultValue": {
+          "title": "The default value of the parameter.",
+          "description": "The default value of the parameter."
+        },
         "allowedValues": {
-          "type": "array"
+          "type": "array",
+          "title": "The allowed values of the parameter.",
+          "description": "The allowed values of the parameter."
         },
         "minValue": {
-          "type": "integer"
+          "type": "integer",
+          "title": "The minimum value of the parameter.",
+          "description": "The minimum value of the parameter."
         },
         "maxValue": {
-          "type": "integer"
+          "type": "integer",
+          "title": "The maximum value of the parameter.",
+          "description": "The maximum value of the parameter."
         },
         "minLength": {
-          "type": "integer"
+          "type": "integer",
+          "title": "The minimum length of the parameter value.",
+          "description": "The minimum length of the parameter value."
         },
         "maxLength": {
-          "type": "integer"
+          "type": "integer",
+          "title": "The maximum length of the parameter value.",
+          "description": "The maximum length of the parameter value."
         },
         "metadata": {
           "type": "object",
-          "$ref": "#/definitions/BatchTemplateParameterMetadata"
+          "$ref": "#/definitions/BatchTemplateParameterMetadata",
+          "title": "Additional data about the parameter.",
+          "description": "Additional data about the parameter."
         }
       },
       "required": [
@@ -62,31 +83,36 @@
     "BatchTemplateParameterMetadata": {
       "properties": {
         "description": {
-          "type": "string"
+          "type": "string",
+          "title": "A description of the parameter, suitable for display in a user interface.",
+          "description": "A description of the parameter, suitable for display in a user interface."
         }
       },
-      "title": "TBD"
+      "title": "Additional data about an Azure Batch template parameter."
     },
     "PoolTemplatePool": {
       "properties": {
         "type": {
           "type": "string",
-          "title": "TBD",
+          "title": "The type of Azure Batch resource to create. Must be 'Microsoft.Batch/batchAccounts/pools'.",
           "enum": [
             "Microsoft.Batch/batchAccounts/pools"
-          ]
+          ],
+          "description": "The type of Azure Batch resource to create. Must be 'Microsoft.Batch/batchAccounts/pools'."
         },
         "apiVersion": {
           "type": "string",
-          "title": "TBD",
+          "title": "The Azure Batch API version against which the template is written. Must be '2017-05-01.5.0'.",
           "enum": [
             "2017-05-01.5.0"
-          ]
+          ],
+          "description": "The Azure Batch API version against which the template is written. Must be '2017-05-01.5.0'."
         },
         "properties": {
           "type": "object",
           "$ref": "#/definitions/PoolAddParameter",
-          "title": "TBD"
+          "title": "The pool to be created from the template.",
+          "description": "The pool to be created from the template."
         }
       },
       "required": [
@@ -94,7 +120,7 @@
         "apiVersion",
         "properties"
       ],
-      "title": "TBD"
+      "title": "The resource to be created from an Azure Batch template."
     },
     "PoolAddParameter": {
       "properties": {
@@ -268,8 +294,8 @@
           "items": {
             "$ref": "#/definitions/PackageReference"
           },
-          "title": "Biscotti!",
-          "description": "Biscotti!"
+          "title": "A collection of packages to be added from external package managers to each node in the pool.",
+          "description": "A collection of packages to be added from external package managers to each node in the pool."
         }
       },
       "required": [
@@ -534,8 +560,8 @@
         "source": {
           "type": "object",
           "$ref": "#/definitions/ResourceFileSource",
-          "title": "TBD.",
-          "description": "TBD."
+          "title": "A source for files to be downloaded before running the task command line.",
+          "description": "A source for files to be downloaded before running the task command line."
         }
       },
       "required": [
@@ -548,13 +574,13 @@
       "properties": {
         "fileGroup": {
           "type": "string",
-          "title": "TBD",
-          "description": "TBD"
+          "title": "The file group in the linked storage account from which to download files.",
+          "description": "The file group in the linked storage account from which to download files."
         },
         "prefix": {
           "type": "string",
-          "title": "TBD",
-          "description": "TBD"
+          "title": "A prefix with which to filter the files to download.",
+          "description": "A prefix with which to filter the files to download."
         }
       },
       "required": [
@@ -822,17 +848,17 @@
         },
         "id": {
           "type": "string",
-          "title": "TBD",
-          "description": "TBD"
+          "title": "The name or ID of the package to be installed as identified according to the package repository.",
+          "description": "The name or ID of the package to be installed as identified according to the package repository."
         },
         "version": {
           "type": "string",
-          "title": "TBD",
-          "description": "TBD"
+          "title": "The version of the package to be installed.",
+          "description": "The version of the package to be installed."
         },
         "allowEmptyChecksums": {
-          "title": "TBD",
-          "description": "TBD",
+          "title": "Whether Chocolatey will install packages without a checksum for validation.",
+          "description": "Whether Chocolatey will install packages without a checksum for validation.",
           "anyOf": [
             {
               "type": "boolean"
@@ -845,8 +871,8 @@
         },
         "disableExcludes": {
           "type": "string",
-          "title": "TBD",
-          "description": "TBD"
+          "title": "Packages that might otherwise be excluded by VM configuration (e.g. kernel packages).",
+          "description": "Packages that might otherwise be excluded by VM configuration (e.g. kernel packages)."
         }
       },
       "required": [
