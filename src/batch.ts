@@ -55,7 +55,7 @@ function parseTemplateCore(json : any) : IBatchResource {
             defaultValue : pval['defaultValue'],
             allowedValues : pval['allowedValues'],
             metadata : <IBatchTemplateParameterMetadata>(pval['metadata']),
-        })
+        });
     }
 
     return { isTemplate: true, templateValidationFailure: '', parameters: parameters };
@@ -84,7 +84,7 @@ function parseParametersCore(json : any) : IParameterValue[] {
         parameters.push({
             name : key,
             value : json[key]
-        })
+        });
     }
 
     return parameters;
@@ -126,7 +126,7 @@ export function makeTemplate(resource : any, resourceType : BatchResourceType) :
         type: templateResourceType(resourceType),
         apiVersion: '2017-05-01',
         properties: templateBody
-    }
+    };
 
     return template;
 }

@@ -87,7 +87,7 @@ class RootNode implements AzureBatchTreeNode {
 class ResourceNode implements AzureBatchTreeNode {
     constructor(readonly text : string, readonly resourceType : batch.BatchResourceType, readonly resource : any) { }
     readonly kind : AbtnKind = 'resource';
-    readonly uri : vscode.Uri = vscode.Uri.parse(`${UriScheme}://${this.resourceType}/${this.resource.id}.json`)
+    readonly uri : vscode.Uri = vscode.Uri.parse(`${UriScheme}://${this.resourceType}/${this.resource.id}.json`);
 }
 
 class ErrorNode implements AzureBatchTreeNode {
