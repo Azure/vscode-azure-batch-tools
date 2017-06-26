@@ -25,6 +25,17 @@
             }
         }
     },
+    "PoolSpecification": {
+        "properties": {
+            "packageReferences" : {
+                "type": "array",
+                "items": {
+                    "$ref": "#/definitions/PackageReference"
+                },
+                "title": "A collection of packages to be added from external package managers to each node in the pool."
+            }
+        }
+    },
     "TaskAddParameter": {
         "properties": {
             "packageReferences" : {
@@ -33,6 +44,15 @@
                     "$ref": "#/definitions/PackageReference"
                 },
                 "title": "A collection of packages from external package managers to be added to the node where the task runs."
+            }
+        }
+    },
+    "OutputFileDestination": {
+        "properties": {
+            "autoStorage": {
+                "type": "object",
+                "$ref": "#/definitions/OutputFileAutoStorageDestination",
+                "title": "A destination in the linked storage account to which to persist output files."
             }
         }
     },
@@ -156,6 +176,19 @@
             "prefix": {
                 "type": "string",
                 "title": "A prefix with which to filter the files to download."
+            }
+        },
+        "required": ["fileGroup"]
+    },
+    "OutputFileAutoStorageDestination": {
+        "properties": {
+            "fileGroup": {
+                "type": "string",
+                "title": "The file group in the linked storage account to which to save files."
+            },
+            "path": {
+                "type": "string",
+                "title": "The path within the file group to which output files will be uploaded."
             }
         },
         "required": ["fileGroup"]

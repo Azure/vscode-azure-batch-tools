@@ -277,6 +277,12 @@
           "title": "A location in Azure blob storage to which files are uploaded.",
           "$ref": "#/definitions/OutputFileBlobContainerDestination",
           "description": "A location in Azure blob storage to which files are uploaded."
+        },
+        "autoStorage": {
+          "type": "object",
+          "$ref": "#/definitions/OutputFileAutoStorageDestination",
+          "title": "A destination in the linked storage account to which to persist output files.",
+          "description": "A destination in the linked storage account to which to persist output files."
         }
       },
       "title": "The destination to which a file should be uploaded."
@@ -298,6 +304,23 @@
         "containerUrl"
       ],
       "title": "Specifies a file upload destination within an Azure blob storage container."
+    },
+    "OutputFileAutoStorageDestination": {
+      "properties": {
+        "fileGroup": {
+          "type": "string",
+          "title": "The file group in the linked storage account to which to save files.",
+          "description": "The file group in the linked storage account to which to save files."
+        },
+        "path": {
+          "type": "string",
+          "title": "The path within the file group to which output files will be uploaded.",
+          "description": "The path within the file group to which output files will be uploaded."
+        }
+      },
+      "required": [
+        "fileGroup"
+      ]
     },
     "OutputFileUploadOptions": {
       "properties": {
@@ -746,6 +769,14 @@
           },
           "title": "A list of name-value pairs associated with the pool as metadata.",
           "description": "A list of name-value pairs associated with the pool as metadata."
+        },
+        "packageReferences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PackageReference"
+          },
+          "title": "A collection of packages to be added from external package managers to each node in the pool.",
+          "description": "A collection of packages to be added from external package managers to each node in the pool."
         }
       },
       "required": [
@@ -1112,6 +1143,39 @@
       "title": "A name-value pair associated with a Batch service resource.",
       "description": "The Batch service does not assign any meaning to this metadata; it is solely for the use of user code."
     },
+    "PackageReference": {
+      "properties": {
+        "type": {
+          "type": "string",
+          "title": "The type of package - aptPackage, chocolateyPackage, or yumPackage",
+          "description": "The type of package - aptPackage, chocolateyPackage, or yumPackage"
+        },
+        "id": {
+          "type": "string",
+          "title": "The name or ID of the package to be installed as identified according to the package repository.",
+          "description": "The name or ID of the package to be installed as identified according to the package repository."
+        },
+        "version": {
+          "type": "string",
+          "title": "The version of the package to be installed.",
+          "description": "The version of the package to be installed."
+        },
+        "allowEmptyChecksums": {
+          "type": "boolean",
+          "title": "Whether Chocolatey will install packages without a checksum for validation.",
+          "description": "Whether Chocolatey will install packages without a checksum for validation."
+        },
+        "disableExcludes": {
+          "type": "string",
+          "title": "Packages that might otherwise be excluded by VM configuration (e.g. kernel packages).",
+          "description": "Packages that might otherwise be excluded by VM configuration (e.g. kernel packages)."
+        }
+      },
+      "required": [
+        "type",
+        "id"
+      ]
+    },
     "OnAllTasksComplete": {
       "type": "string",
       "title": "The action the Batch service should take when all tasks in the job are in the completed state.",
@@ -1469,39 +1533,6 @@
       "required": [
         "start",
         "end"
-      ]
-    },
-    "PackageReference": {
-      "properties": {
-        "type": {
-          "type": "string",
-          "title": "The type of package - aptPackage, chocolateyPackage, or yumPackage",
-          "description": "The type of package - aptPackage, chocolateyPackage, or yumPackage"
-        },
-        "id": {
-          "type": "string",
-          "title": "The name or ID of the package to be installed as identified according to the package repository.",
-          "description": "The name or ID of the package to be installed as identified according to the package repository."
-        },
-        "version": {
-          "type": "string",
-          "title": "The version of the package to be installed.",
-          "description": "The version of the package to be installed."
-        },
-        "allowEmptyChecksums": {
-          "type": "boolean",
-          "title": "Whether Chocolatey will install packages without a checksum for validation.",
-          "description": "Whether Chocolatey will install packages without a checksum for validation."
-        },
-        "disableExcludes": {
-          "type": "string",
-          "title": "Packages that might otherwise be excluded by VM configuration (e.g. kernel packages).",
-          "description": "Packages that might otherwise be excluded by VM configuration (e.g. kernel packages)."
-        }
-      },
-      "required": [
-        "type",
-        "id"
       ]
     },
     "ParametricSweepParameterSet": {
