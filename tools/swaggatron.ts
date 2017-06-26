@@ -82,7 +82,7 @@ async function createResourceSchema(resourceType : batch.BatchResourceType) : Pr
     const bodySchema = chaseRef(swagger, addResourceBodySchemaRef);
 
     schemaDefinitions[bodySchema.name] = bodySchema.schema;
-    mungeSchema(schemaDefinitions[bodySchema.name]);
+    fixSchemaSoTitlesShowInJsonValidation(schemaDefinitions[bodySchema.name]);
 
     recursivelyAddDefns(swagger, bodySchema.schema, schemaDefinitions);
 
@@ -288,12 +288,12 @@ function recursivelyAddDefnsForRef(swagger: any, ref: string, destination: any) 
     const refSchema = chaseRef(swagger, ref);
     if (!destination[refSchema.name]) {
         destination[refSchema.name] = refSchema.schema;
-        mungeSchema(destination[refSchema.name]);
+        fixSchemaSoTitlesShowInJsonValidation(destination[refSchema.name]);
         recursivelyAddDefns(swagger, refSchema.schema, destination);
     }
 }
 
-function mungeSchema(schema: any) : any {
+function fixSchemaSoTitlesShowInJsonValidation(schema: any) : any {
     // Workaround for https://github.com/Microsoft/vscode/issues/28978
     if (schema.properties) {
         for (const p in schema.properties) {
