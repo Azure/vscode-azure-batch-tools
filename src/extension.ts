@@ -355,7 +355,7 @@ export async function convertToParameterCore(document: vscode.TextDocument, sele
         type: propertyType,
         defaultValue: propertyValue,
         metadata: { description: `Value for ${property.containerName}.${property.name}` }
-    }
+    };
 
     const insertParamEdit = textmodels.getTemplateParameterInsertion(jsonSymbols, property.name, newParameterDefn);
 
@@ -399,7 +399,7 @@ function getParameterTypeName(value : any) : string {
 }
 
 async function viewnodeGet(node : azurebatchtree.AzureBatchTreeNode) {
-    const document = await vscode.workspace.openTextDocument(node.uri)
+    const document = await vscode.workspace.openTextDocument(node.uri);
     vscode.window.showTextDocument(document);
 }
 
@@ -413,7 +413,7 @@ async function viewnodeGetAsTemplate(node : azurebatchtree.AzureBatchTreeNode) {
 }
 
 interface AllowedValueQuickPickItem extends vscode.QuickPickItem {
-    value : any
+    value : any;
 }
 
 interface ITempFileInfo {

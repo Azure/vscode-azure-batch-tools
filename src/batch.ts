@@ -55,7 +55,7 @@ function parseTemplateCore(json : any) : IBatchResource {
             defaultValue : pval['defaultValue'],
             allowedValues : pval['allowedValues'],
             metadata : <IBatchTemplateParameterMetadata>(pval['metadata']),
-        })
+        });
     }
 
     return { isTemplate: true, templateValidationFailure: '', parameters: parameters };
@@ -84,7 +84,7 @@ function parseParametersCore(json : any) : IParameterValue[] {
         parameters.push({
             name : key,
             value : json[key]
-        })
+        });
     }
 
     return parameters;
@@ -118,7 +118,7 @@ export function makeTemplate(resource : any, resourceType : BatchResourceType) :
     // TODO: strip defaults (particularly nulls or empty objects) - we get null-stripping as a side-effect of transformProperties but shouldn't rely on this!
     const templateBody = filtered;
 
-    var template : any = {
+    let template : any = {
         parameters: { }
     };
 
@@ -126,13 +126,13 @@ export function makeTemplate(resource : any, resourceType : BatchResourceType) :
         type: templateResourceType(resourceType),
         apiVersion: '2017-05-01',
         properties: templateBody
-    }
+    };
 
     return template;
 }
 
 function withoutProperties(resource : any, properties : string[]) : any {
-    var result : any = {};
+    let result : any = {};
     for (const property in resource) {
         if (properties.indexOf(property) < 0) {
             result[property] = resource[property];
@@ -142,7 +142,7 @@ function withoutProperties(resource : any, properties : string[]) : any {
 }
 
 function transformProperties(obj : any, properties: string[], transform : (original : string | undefined) => string | undefined) : any {
-    var result : any = {};
+    let result : any = {};
     for (const property in obj) {
         const value = obj[property];
         if (value instanceof Array) {
