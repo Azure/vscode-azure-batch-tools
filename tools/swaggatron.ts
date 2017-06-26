@@ -52,6 +52,13 @@ const enrichments : any = {
             { required: ["imageReference"] },
             { required: ["osDisk"] }
         ]
+    },
+    ResourceFile: {
+        oneOf: [
+            { required: ["source"] },
+            { required: ["blobSource"] }
+        ],
+        required: []
     }
 };
 

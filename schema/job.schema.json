@@ -223,11 +223,20 @@
           "description": "A source for files to be downloaded before running the task command line."
         }
       },
-      "required": [
-        "blobSource",
-        "filePath"
-      ],
-      "title": "A file to be downloaded from Azure blob storage to a compute node."
+      "required": [],
+      "title": "A file to be downloaded from Azure blob storage to a compute node.",
+      "oneOf": [
+        {
+          "required": [
+            "source"
+          ]
+        },
+        {
+          "required": [
+            "blobSource"
+          ]
+        }
+      ]
     },
     "ResourceFileSource": {
       "properties": {
