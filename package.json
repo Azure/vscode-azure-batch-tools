@@ -57,12 +57,14 @@
         "category": "Azure"
       },
       {
-        "command": "azure.batch.get",
-        "title": "Get"
+        "command": "azure.batch.getBatchResource",
+        "title": "Get Batch Resource",
+        "category": "Azure"
       },
       {
-        "command": "azure.batch.getAsTemplate",
-        "title": "Get as Template"
+        "command": "azure.batch.getBatchResourceAsTemplate",
+        "title": "Get Batch Resource as Template",
+        "category": "Azure"
       },
       {
         "command": "azure.batch.refresh",
@@ -97,11 +99,11 @@
       ],
       "view/item/context": [
         {
-          "command": "azure.batch.get",
+          "command": "azure.batch.getBatchResource",
           "when": "view == azure.batch.explorer && viewItem == azure.batch.resource"
         },
         {
-          "command": "azure.batch.getAsTemplate",
+          "command": "azure.batch.getBatchResourceAsTemplate",
           "when": "view == azure.batch.explorer && viewItem == azure.batch.resource"
         }
       ]
