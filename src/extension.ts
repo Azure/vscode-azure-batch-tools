@@ -393,6 +393,11 @@ function getParameterTypeName(value : any) : string {
 }
 
 async function viewnodeGet(node : azurebatchtree.AzureBatchTreeNode) {
+    if (!node) {
+        // TODO: handle this more politely
+        vscode.window.showErrorMessage("This command is used only from the Azure Batch explorer.")
+        return;
+    }
     if (azurebatchtree.isResourceNode(node)) {
         const filename = node.resourceId + `.${node.resourceType}.json`;
         createFile(filename, JSON.stringify(node.resource, null, 2));
@@ -400,6 +405,11 @@ async function viewnodeGet(node : azurebatchtree.AzureBatchTreeNode) {
 }
 
 async function viewnodeGetAsTemplate(node : azurebatchtree.AzureBatchTreeNode) {
+    if (!node) {
+        // TODO: handle this more politely
+        vscode.window.showErrorMessage("This command is used only from the Azure Batch explorer.")
+        return;
+    }
     if (azurebatchtree.isResourceNode(node)) {
         createTemplateFile(node.resourceType, node.resource, node.resourceId);
     }
