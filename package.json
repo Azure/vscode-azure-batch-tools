@@ -56,18 +56,18 @@
         "title": "Convert to Batch Template Parameter",
         "category": "Azure"
       },
-			{
-				"command": "azure.batch.get",
-				"title": "Get"
-			},
-			{
-				"command": "azure.batch.getAsTemplate",
-				"title": "Get as Template"
-			},
-			{
-				"command": "azure.batch.refresh",
-				"title": "Refresh"
-			}
+      {
+        "command": "azure.batch.get",
+        "title": "Get"
+      },
+      {
+        "command": "azure.batch.getAsTemplate",
+        "title": "Get as Template"
+      },
+      {
+        "command": "azure.batch.refresh",
+        "title": "Refresh"
+      }
     ],
     "snippets": [
       {
