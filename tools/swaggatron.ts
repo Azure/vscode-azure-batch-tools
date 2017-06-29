@@ -107,6 +107,7 @@ async function createApplicationTemplateSchema() : Promise<any> {
     let schema : any = JSON.parse(fs.readFileSync(path.join(__dirname, "../../tools/applicationtemplate.schematemplate.json"), 'utf8'));
     fixAllDefinitionsSoTitlesShowInJsonValidation(schema);
     const jobSchema = await createResourceSchema('job');
+    addParameterSupport(jobSchema.definitions);
     for (const d in jobSchema.definitions) {
         schema.definitions[d] = jobSchema.definitions[d];
     }
