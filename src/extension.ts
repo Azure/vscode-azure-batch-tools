@@ -395,7 +395,7 @@ function getParameterTypeName(value : any) : string {
 async function viewnodeGet(node : azurebatchtree.AzureBatchTreeNode) {
     if (!node) {
         // TODO: handle this more politely
-        vscode.window.showErrorMessage("This command may be used only from the Azure Batch explorer.")
+        vscode.window.showErrorMessage("This command may be used only from the Azure Batch explorer.");
         return;
     }
     if (azurebatchtree.isResourceNode(node)) {
@@ -407,7 +407,7 @@ async function viewnodeGet(node : azurebatchtree.AzureBatchTreeNode) {
 async function viewnodeGetAsTemplate(node : azurebatchtree.AzureBatchTreeNode) {
     if (!node) {
         // TODO: handle this more politely
-        vscode.window.showErrorMessage("This command may be used only from the Azure Batch explorer.")
+        vscode.window.showErrorMessage("This command may be used only from the Azure Batch explorer.");
         return;
     }
     if (azurebatchtree.isResourceNode(node)) {
