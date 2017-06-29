@@ -104,20 +104,21 @@ async function writeApplicationTemplateSchema() : Promise<void> {
 }
 
 async function createApplicationTemplateSchema() : Promise<any> {
-    let schema : any = JSON.parse(fs.readFileSync(path.join(__dirname, "../../tools/applicationtemplate.schematemplate.json"), 'utf8'));
-    fixAllDefinitionsSoTitlesShowInJsonValidation(schema);
+    const appTemplateSchemaTemplatePath = path.join(__dirname, "../../tools/applicationtemplate.schematemplate.json");
+    let appTemplateSchema : any = JSON.parse(fs.readFileSync(appTemplateSchemaTemplatePath, 'utf8'));
+    fixAllDefinitionsSoTitlesShowInJsonValidation(appTemplateSchema);
     const jobSchema = await createResourceSchema('job');
     addParameterSupport(jobSchema.definitions);
     for (const d in jobSchema.definitions) {
-        schema.definitions[d] = jobSchema.definitions[d];
+        appTemplateSchema.definitions[d] = jobSchema.definitions[d];
     }
     const jobResourceSchema = jobSchema.definitions['JobAddParameter'];
     for (const p in jobResourceSchema.properties) {
         if (applicationTemplateableProperties.indexOf(p) >= 0) {
-            schema.definitions['BatchApplicationTemplate'].properties[p] = jobResourceSchema.properties[p];
+            appTemplateSchema.definitions['BatchApplicationTemplate'].properties[p] = jobResourceSchema.properties[p];
         }
     }
-    return schema;
+    return appTemplateSchema;
 }
 
 async function createResourceSchema(resourceType : batch.BatchResourceType) : Promise<any> {
