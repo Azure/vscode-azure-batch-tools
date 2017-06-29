@@ -91,8 +91,7 @@ function parseParametersCore(json : any) : IParameterValue[] {
 }
 
 export async function listResources(shellExec : (command : string) => Promise<IShellExecResult>, resourceType : BatchResourceType) : Promise<IBatchResourceContent[] | ICommandError> {
-    //const command = `az batch ${resourceType} list --query [*].{id:id,displayName:displayName}`;  // the problem is we are going to want to stringify the resource JSON and that means we need to download it - or do a second call
-    const command = `az batch ${resourceType} list`;
+    const command = `az batch ${resourceType} list -ojson`;
     const result = await shellExec(command);
     if (result.exitCode === 0) {
         const raw : any[] = JSON.parse(result.output);
@@ -103,7 +102,7 @@ export async function listResources(shellExec : (command : string) => Promise<IS
 }
 
 export async function getResource(shellExec : (command : string) => Promise<IShellExecResult>, resourceType : BatchResourceType, id : string) : Promise<IBatchResourceContent | ICommandError> {
-    const command = `az batch ${resourceType} show --${resourceType}-id ${id}`;
+    const command = `az batch ${resourceType} show --${resourceType}-id ${id} -ojson`;
     const result = await shellExec(command);
     if (result.exitCode === 0) {
         const raw = JSON.parse(result.output);

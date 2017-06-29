@@ -5,7 +5,7 @@ import * as host from './host';
 
 export const UriScheme : string = 'ab';
 
-export class AzureBatchProvider implements vscode.TreeDataProvider<AzureBatchTreeNode>, vscode.TextDocumentContentProvider {
+export class AzureBatchProvider implements vscode.TreeDataProvider<AzureBatchTreeNode> {
 	private _onDidChangeTreeData: vscode.EventEmitter<AzureBatchTreeNode | undefined> = new vscode.EventEmitter<AzureBatchTreeNode | undefined>();
 	readonly onDidChangeTreeData: vscode.Event<AzureBatchTreeNode | undefined> = this._onDidChangeTreeData.event;
 
@@ -17,7 +17,7 @@ export class AzureBatchProvider implements vscode.TreeDataProvider<AzureBatchTre
         item.contextValue = 'azure.batch.' + abtn.kind;
         if (isResourceNode(abtn)) {
             item.command = {
-                command: 'azure.batch.get',
+                command: 'azure.batch.getBatchResource',
                 arguments: [abtn],
                 title: 'Get'
             };
@@ -42,20 +42,6 @@ export class AzureBatchProvider implements vscode.TreeDataProvider<AzureBatchTre
         return [new RootNode("Jobs", 'job'), new RootNode("Pools", 'pool')];
     }
 
-    provideTextDocumentContent(uri: vscode.Uri, token : vscode.CancellationToken) : vscode.ProviderResult<string> {
-        const resourceType = <batch.BatchResourceType> uri.authority;
-        const id : string = uri.path.substring(1, uri.path.length - '.json'.length);
-        return this.getBatchResourceJson(resourceType, id);
-    }
-
-    private async getBatchResourceJson(resourceType : batch.BatchResourceType, id : string) : Promise<string> {
-        const getResult = await batch.getResource(shell.exec, resourceType, id);
-        if (shell.isCommandError(getResult)) {
-            throw getResult.error;
-        }
-        return JSON.stringify(getResult, null, 2);
-    }
-
     refresh(): void {
         this._onDidChangeTreeData.fire();
     }
@@ -65,7 +51,7 @@ function isRootNode(node : AzureBatchTreeNode) : node is RootNode {
     return node.kind === 'root';
 }
 
-function isResourceNode(node : AzureBatchTreeNode) : node is ResourceNode {
+export function isResourceNode(node : AzureBatchTreeNode) : node is ResourceNode {
     return node.kind === 'resource';
 }
 
@@ -73,7 +59,7 @@ export interface AzureBatchTreeNode {
     readonly kind : AbtnKind;
     readonly text : string;
     readonly resourceType? : batch.BatchResourceType;
-    readonly uri : vscode.Uri;
+    readonly resourceId? : string;
 }
 
 type AbtnKind = 'root' | 'resource' | 'error';
@@ -81,17 +67,15 @@ type AbtnKind = 'root' | 'resource' | 'error';
 class RootNode implements AzureBatchTreeNode {
     constructor(readonly text : string, readonly resourceType : batch.BatchResourceType) { }
     readonly kind : AbtnKind = 'root';
-    readonly uri : vscode.Uri = vscode.Uri.parse(`${UriScheme}://`);
 }
 
 class ResourceNode implements AzureBatchTreeNode {
     constructor(readonly text : string, readonly resourceType : batch.BatchResourceType, readonly resource : any) { }
     readonly kind : AbtnKind = 'resource';
-    readonly uri : vscode.Uri = vscode.Uri.parse(`${UriScheme}://${this.resourceType}/${this.resource.id}.json`);
+    readonly resourceId : string = this.resource.id;
 }
 
 class ErrorNode implements AzureBatchTreeNode {
     constructor(readonly text : string) { }
     readonly kind : AbtnKind = 'error';
-    readonly uri : vscode.Uri = vscode.Uri.parse(`${UriScheme}://`);
 }
