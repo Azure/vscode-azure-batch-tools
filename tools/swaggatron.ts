@@ -67,6 +67,7 @@ async function writeResourceSchemas() {
     await writeResourceSchema('pool');
     await writeTemplateSchema('job');
     await writeTemplateSchema('pool');
+    await writeApplicationTemplateSchema();
 }
 
 async function writeResourceSchema(resourceType : batch.BatchResourceType) : Promise<void> {
@@ -81,6 +82,41 @@ async function writeTemplateSchema(resourceType: batch.BatchResourceType) : Prom
     const schemaText = JSON.stringify(schema, null, 2);
     const schemaFilePath = path.join(__dirname, `../../schema/${resourceType}template.schema.json`);
     fs.writeFileSync(schemaFilePath, schemaText);
+}
+
+const applicationTemplateableProperties = [
+    "jobManagerTask",
+    "jobPreparationTask",
+    "jobReleaseTask",
+    "commonEnvironmentSettings",
+    "usesTaskDependencies",
+    "onAllTasksComplete",
+    "onTaskFailure",
+    "taskFactory",
+    "metadata"
+];
+
+async function writeApplicationTemplateSchema() : Promise<void> {
+    const schema = await createApplicationTemplateSchema();
+    const schemaText = JSON.stringify(schema, null, 2);
+    const schemaFilePath = path.join(__dirname, `../../schema/applicationtemplate.schema.json`);
+    fs.writeFileSync(schemaFilePath, schemaText);
+}
+
+async function createApplicationTemplateSchema() : Promise<any> {
+    let schema : any = JSON.parse(fs.readFileSync(path.join(__dirname, "../../tools/applicationtemplate.schematemplate.json"), 'utf8'));
+    fixAllDefinitionsSoTitlesShowInJsonValidation(schema);
+    const jobSchema = await createResourceSchema('job');
+    for (const d in jobSchema.definitions) {
+        schema.definitions[d] = jobSchema.definitions[d];
+    }
+    const jobResourceSchema = jobSchema.definitions['JobAddParameter'];
+    for (const p in jobResourceSchema.properties) {
+        if (applicationTemplateableProperties.indexOf(p) >= 0) {
+            schema.definitions['BatchApplicationTemplate'].properties[p] = jobResourceSchema.properties[p];
+        }
+    }
+    return schema;
 }
 
 async function createResourceSchema(resourceType : batch.BatchResourceType) : Promise<any> {
@@ -219,9 +255,7 @@ async function createTemplateSchema(resourceType: batch.BatchResourceType) : Pro
     const resourceSchema = await createResourceSchema(resourceType);
     addParameterSupport(resourceSchema.definitions);
     let templateSchema : any = templateSchemaTemplate(resourceType);
-    for (const p in templateSchema.definitions) {  // Rather than compromise our template schema to deal with the VS Code title bug, we fix it up here
-        fixSchemaSoTitlesShowInJsonValidation(templateSchema.definitions[p]);
-    }
+    fixAllDefinitionsSoTitlesShowInJsonValidation(templateSchema);  // Rather than compromise our template schema to deal with the VS Code title bug, we fix it up here
     Object.assign(templateSchema.definitions, resourceSchema.definitions);
     return templateSchema;
 }
@@ -318,6 +352,12 @@ function recursivelyAddDefnsForRef(swagger: any, ref: string, destination: any) 
         destination[refSchema.name] = refSchema.schema;
         fixSchemaSoTitlesShowInJsonValidation(destination[refSchema.name]);
         recursivelyAddDefns(swagger, refSchema.schema, destination);
+    }
+}
+
+function fixAllDefinitionsSoTitlesShowInJsonValidation(schema: any) : void {
+    for (const p in schema.definitions) {  // Rather than compromise our template schema to deal with the VS Code title bug, we fix it up here
+        fixSchemaSoTitlesShowInJsonValidation(schema.definitions[p]);
     }
 }
 

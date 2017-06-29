@@ -124,6 +124,10 @@
       {
         "fileMatch": "*.pooltemplate.json",
         "url": "./schema/pooltemplate.schema.json"
+      },
+      {
+        "fileMatch": "*.applicationtemplate.json",
+        "url": "./schema/applicationtemplate.schema.json"
       }
     ]
   },
