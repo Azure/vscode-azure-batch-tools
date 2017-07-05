@@ -107,7 +107,29 @@
           "when": "view == azure.batch.explorer && viewItem == azure.batch.resource"
         }
       ]
-    }
+    },
+    "jsonValidation": [
+      {
+        "fileMatch": "*.job.json",
+        "url": "./schema/job.schema.json"
+      },
+      {
+        "fileMatch": "*.pool.json",
+        "url": "./schema/pool.schema.json"
+      },
+      {
+        "fileMatch": "*.jobtemplate.json",
+        "url": "./schema/jobtemplate.schema.json"
+      },
+      {
+        "fileMatch": "*.pooltemplate.json",
+        "url": "./schema/pooltemplate.schema.json"
+      },
+      {
+        "fileMatch": "*.applicationtemplate.json",
+        "url": "./schema/applicationtemplate.schema.json"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "tsc -p ./",

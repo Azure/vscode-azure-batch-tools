@@ -1,0 +1,196 @@
+{
+    "JobAddParameter": {
+        "properties": {
+            "taskFactory" : {
+                "type": "object",
+                "title": "A specification for the tasks to be added to the job.",
+                "$ref": "#/definitions/TaskFactory"
+            },
+            "applicationTemplateInfo" : {
+                "type": "object",
+                "title": "An application template from which to create the job.",
+                "$ref": "#/definitions/ApplicationTemplateInfo"
+            }
+
+        }
+    },
+    "PoolAddParameter": {
+        "properties": {
+            "packageReferences" : {
+                "type": "array",
+                "items": {
+                    "$ref": "#/definitions/PackageReference"
+                },
+                "title": "A collection of packages to be added from external package managers to each node in the pool."
+            }
+        }
+    },
+    "PoolSpecification": {
+        "properties": {
+            "packageReferences" : {
+                "type": "array",
+                "items": {
+                    "$ref": "#/definitions/PackageReference"
+                },
+                "title": "A collection of packages to be added from external package managers to each node in the pool."
+            }
+        }
+    },
+    "TaskAddParameter": {
+        "properties": {
+            "packageReferences" : {
+                "type": "array",
+                "items": {
+                    "$ref": "#/definitions/PackageReference"
+                },
+                "title": "A collection of packages from external package managers to be added to the node where the task runs."
+            }
+        }
+    },
+    "OutputFileDestination": {
+        "properties": {
+            "autoStorage": {
+                "type": "object",
+                "$ref": "#/definitions/OutputFileAutoStorageDestination",
+                "title": "A destination in the linked storage account to which to persist output files."
+            }
+        }
+    },
+    "PackageReference": {
+        "properties":{
+            "type": {
+                "type": "string",
+                "title": "The type of package - aptPackage, chocolateyPackage, or yumPackage"
+            },
+            "id": {
+                "type": "string",
+                "title": "The name or ID of the package to be installed as identified according to the package repository."
+            },
+            "version": {
+                "type": "string",
+                "title": "The version of the package to be installed."
+            },
+            "allowEmptyChecksums": {
+                "type": "boolean",
+                "title": "Whether Chocolatey will install packages without a checksum for validation."
+            },
+            "disableExcludes": {
+                "type": "string",
+                "title": "Packages that might otherwise be excluded by VM configuration (e.g. kernel packages)."
+            }
+        },
+        "required": ["type", "id"]
+    },
+    "TaskFactory": {
+        "properties":{
+            "type": {
+                "type": "string",
+                "title": "The type of task factory - taskCollection, parametricSweep or taskPerFile"
+            },
+            "tasks": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/definitions/TaskAddParameter"
+                },
+                "title": "The tasks that make up the job."
+            },
+            "parameterSets": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/definitions/ParametricSweepParameterSet"
+                },
+                "title": "The parameter or parameters whose values will be varied over the parametric sweep."
+            },
+            "repeatTask": {
+                "type": "object",
+                "$ref": "#/definitions/RepeatTask",
+                "title": "The task that is to be repeated for each value."
+            },
+            "source": {
+                "type": "object",
+                "$ref": "#/definitions/TaskPerFileSource",
+                "title": "The source of the files for which to create tasks."
+            }
+        }
+    },
+    "ParametricSweepParameterSet": {
+        "properties": {
+            "start": {
+                "type": "integer",
+                "title": "The start of the parametric sweep range."
+            },
+            "end": {
+                "type": "integer",
+                "title": "The end of the parametric sweep range."
+            },
+            "step": {
+                "type": "integer",
+                "title": "The increment step between values of the parameter."
+            }
+        },
+        "required": ["start", "end"]
+    },
+    "TaskPerFileSource": {
+        "properties": {
+            "fileGroup": {
+                "type": "string",
+                "title": "The file group in the linked storage account from which to take files."
+            },
+            "containerUrl": {
+                "type": "string",
+                "title": "The URL of an Azure Storage blob container from which to take files, including any required Shared Access Signature (SAS)."
+            },
+            "prefix": {
+                "type": "string",
+                "title": "A prefix with which to filter the files from which to create tasks."
+            }
+        }
+    },
+    "ApplicationTemplateInfo": {
+        "properties":{
+            "filePath": {
+                "type": "string",
+                "title": "The path to the application template file."
+            },
+            "parameters": {
+                "type": "object",
+                "title": "The values to assign to the application template parameters."
+            }
+        }
+    },
+    "ResourceFile": {
+        "properties": {
+            "source": {
+                "type": "object",
+                "$ref": "#/definitions/ResourceFileSource",
+                "title": "A source for files to be downloaded before running the task command line."
+            }
+        }
+    },
+    "ResourceFileSource": {
+        "properties": {
+            "fileGroup": {
+                "type": "string",
+                "title": "The file group in the linked storage account from which to download files."
+            },
+            "prefix": {
+                "type": "string",
+                "title": "A prefix with which to filter the files to download."
+            }
+        },
+        "required": ["fileGroup"]
+    },
+    "OutputFileAutoStorageDestination": {
+        "properties": {
+            "fileGroup": {
+                "type": "string",
+                "title": "The file group in the linked storage account to which to save files."
+            },
+            "path": {
+                "type": "string",
+                "title": "The path within the file group to which output files will be uploaded."
+            }
+        },
+        "required": ["fileGroup"]
+    }
+}

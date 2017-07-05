@@ -1,0 +1,69 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "applicationtemplate",
+    "description": "An Azure Batch application template",
+    "type": "object",
+    "$ref": "#/definitions/BatchApplicationTemplate",
+    "definitions": {
+        "BatchApplicationTemplate": {
+            "properties": {
+                "templateMetadata": {
+                    "type": "object",
+                    "$ref": "#/definitions/BatchApplicationTemplateMetadata",
+                    "title": "Additional information about the template itself."
+                },
+                "parameters": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "$ref": "#/definitions/BatchApplicationTemplateParameter"
+                    },
+                    "title": "The parameters whose values may be supplied each time the template is used."
+                }
+            }
+        },
+        "BatchApplicationTemplateMetadata": {
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "title": "A simple description of the functionality provided by the template."
+                },
+                "author": {
+                    "type": "string",
+                    "title": "The name or email address of the template author."
+                },
+                "dateUpdated": {
+                    "type": "string",
+                    "title": "A human readable message (a date or a version number) for when the template was last modified."
+                }
+            }
+        },
+        "BatchApplicationTemplateParameter": {
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [ "int", "string", "bool" ],
+                    "title": "The data type of the parameter."
+                },
+                "defaultValue": {
+                    "title": "The default value of the parameter."
+                },
+                "metadata": {
+                    "type": "object",
+                    "$ref": "#/definitions/BatchApplicationTemplateParameterMetadata",
+                    "title": "Additional data about the parameter."
+                }
+            },
+            "required": ["type"]
+        },
+        "BatchApplicationTemplateParameterMetadata": {
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "title": "A description of the parameter, suitable for display in a user interface."
+                }
+            },
+            "title": "Additional data about an Azure Batch template parameter."
+        }
+    }
+}
